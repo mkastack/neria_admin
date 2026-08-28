@@ -1,26 +1,149 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --neria-pink: #FF4FA3;
+    --neria-pink-hover: #E63E90;
+    --neria-pink-light: #FFD8EA;
+    --neria-pink-blush: #FFF4F8;
+    --neria-powder-blue: #CBE7FA;
+    --neria-powder-blue-light: #EBF4FC;
+    --neria-navy: #263550;
+    --neria-navy-light: #3D4F6E;
+    --neria-cream: #FFFAF5;
+    
+    --bg-page: #FFF4F8;
+    --bg-card: #FFFFFF;
+    
+    --gray-50: #F8F8FA;
+    --gray-100: #F2F3F5;
+    --gray-200: #DDE1E7;
+    --gray-300: #C2C8D2;
+    --gray-400: #98A0AE;
+    --gray-500: #667085;
+    --gray-600: #475467;
+    --gray-700: #344054;
+    --gray-800: #1D2939;
+    --gray-900: #101828;
+  }
+
+  body {
+    background-color: var(--bg-page);
+    color: var(--neria-navy);
+    font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
+    -webkit-font-smoothing: antialiased;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Custom Scrollbar for sleek aesthetic */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #DDE1E7;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #FFD8EA;
+}
+
+/* Glassmorphism & Soft effects */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.neria-card {
+  background: #FFFFFF;
+  border: 1px solid #F2F3F5;
+  box-shadow: 0 1px 3px 0 rgba(38, 53, 80, 0.04), 0 1px 2px -1px rgba(38, 53, 80, 0.02);
+  border-radius: 1rem;
+}
+
+.neria-card-interactive {
+  background: #FFFFFF;
+  border: 1px solid #F2F3F5;
+  box-shadow: 0 1px 3px 0 rgba(38, 53, 80, 0.04);
+  border-radius: 1rem;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.neria-card-interactive:hover {
+  border-color: #FFD8EA;
+  box-shadow: 0 6px 20px -4px rgba(255, 79, 163, 0.08);
+  transform: translateY(-1px);
+}
+
+.neria-btn-primary {
+  background: #FF4FA3;
+  color: #FFFFFF;
+  font-weight: 500;
+  border-radius: 0.75rem;
+  transition: all 0.18s ease;
+  box-shadow: 0 2px 6px rgba(255, 79, 163, 0.25);
+}
+
+.neria-btn-primary:hover {
+  background: #E63E90;
+  box-shadow: 0 4px 12px rgba(255, 79, 163, 0.35);
+  transform: translateY(-1px);
+}
+
+.neria-btn-secondary {
+  background: #FFFFFF;
+  color: #263550;
+  border: 1px solid #DDE1E7;
+  font-weight: 500;
+  border-radius: 0.75rem;
+  transition: all 0.18s ease;
+}
+
+.neria-btn-secondary:hover {
+  background: #FFF4F8;
+  border-color: #FFD8EA;
+  color: #FF4FA3;
+}
+
+.badge-paid {
+  background-color: #ECFDF3;
+  color: #027A48;
+  border: 1px solid #ABEFC6;
+}
+
+.badge-pending {
+  background-color: #FFFAEB;
+  color: #B54708;
+  border: 1px solid #FEDF89;
+}
+
+.badge-failed {
+  background-color: #FEF3F2;
+  color: #B42318;
+  border: 1px solid #FECDCA;
+}
+
+.badge-fulfilled, .badge-delivered {
+  background-color: #F0F9FF;
+  color: #026AA2;
+  border: 1px solid #B9E6FE;
+}
+
+.badge-shipped {
+  background-color: #F4F3FF;
+  color: #5925DC;
+  border: 1px solid #D9D6FE;
+}
+
+.badge-active {
+  background-color: #FFF4F8;
+  color: #FF4FA3;
+  border: 1px solid #FFD8EA;
 }
