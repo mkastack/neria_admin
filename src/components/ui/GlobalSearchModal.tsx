@@ -15,12 +15,19 @@ const RECENT = [
 ];
 
 const QUICK_LINKS = [
+  { title: 'Live Visual Website Editor', url: '/admin/website/editor', group: 'Website CMS', icon: '✨' },
+  { title: 'Homepage Hero & Lookbooks', url: '/admin/website/editor?section=sec-hero', group: 'Website CMS', icon: '🎀' },
+  { title: 'Announcement Bar Manager', url: '/admin/website/announcements', group: 'Website CMS', icon: '📢' },
+  { title: 'Promotional Popups (15% Off)', url: '/admin/website/popups', group: 'Website CMS', icon: '🎁' },
+  { title: 'Brand Assets & Bunny Library', url: '/admin/website/brand', group: 'Website CMS', icon: '🐰' },
+  { title: 'Theme Colors & CSS Variables', url: '/admin/website/theme', group: 'Website CMS', icon: '🎨' },
+  { title: 'Store Pages (About, FAQ, Size Guide)', url: '/admin/website/pages', group: 'Website CMS', icon: '📄' },
+  { title: 'SEO Previews & Google Health', url: '/admin/website/seo', group: 'Website CMS', icon: '🌐' },
   { title: 'Overview Dashboard', url: '/admin', group: 'Navigation', icon: '📊' },
   { title: 'Orders & Shipments', url: '/admin/orders', group: 'Commerce', icon: '📦' },
   { title: 'Products & Lookbooks', url: '/admin/products', group: 'Commerce', icon: '👗' },
   { title: 'Inventory Warehouse', url: '/admin/inventory', group: 'Ops', icon: '🗄️' },
   { title: 'Discounts & Coupons', url: '/admin/discounts', group: 'Commerce', icon: '🏷️' },
-  { title: 'Homepage Content', url: '/admin/content/homepage', group: 'Content', icon: '🏠' },
   { title: 'Analytics & Revenue', url: '/admin/analytics', group: 'Business', icon: '📈' },
   { title: 'Store Settings', url: '/admin/settings', group: 'Settings', icon: '⚙️' },
 ];

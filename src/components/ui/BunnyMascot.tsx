@@ -1,10 +1,11 @@
 'use client';
 
 import React from 'react';
+import { BunnyMood } from '@/src/lib/types';
 
 interface BunnyMascotProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
-  mood?: 'happy' | 'celebrate' | 'thinking' | 'sleeping';
+  mood?: BunnyMood | 'happy' | 'celebrate' | 'celebration' | 'thinking' | 'sleeping' | string;
   className?: string;
 }
 

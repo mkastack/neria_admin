@@ -11,7 +11,7 @@ import {
   Undo2, Megaphone, Sparkles, Image as ImageIcon, Star, HeartHandshake,
   Mail, LayoutTemplate, Film, FileText, Menu as MenuIcon, BarChart3,
   FileSpreadsheet, Landmark, ShieldCheck, ShieldAlert, History, Bell,
-  Settings, ChevronLeft, ChevronRight, X, LogOut, ExternalLink
+  Settings, ChevronLeft, ChevronRight, X, LogOut, ExternalLink, Globe, Palette, Sliders
 } from 'lucide-react';
 
 interface NavItem {
@@ -51,6 +51,24 @@ export function AdminSidebar() {
       ]
     },
     {
+      label: 'Website & Storefront',
+      items: [
+        { name: 'Overview', href: '/admin/website', icon: Globe },
+        { name: 'Live Visual Editor', href: '/admin/website/editor', icon: Sparkles, badge: 'Editor' },
+        { name: 'Homepage Sections', href: '/admin/website/homepage', icon: LayoutTemplate },
+        { name: 'Store Pages', href: '/admin/website/pages', icon: FileText },
+        { name: 'Navigation Menus', href: '/admin/website/navigation', icon: MenuIcon },
+        { name: 'Announcements', href: '/admin/website/announcements', icon: Megaphone },
+        { name: 'Popups & Modals', href: '/admin/website/popups', icon: Gift },
+        { name: 'Brand & Bunnies', href: '/admin/website/brand', icon: Sparkles },
+        { name: 'Theme & Colors', href: '/admin/website/theme', icon: Palette },
+        { name: 'Storefront Footer', href: '/admin/website/footer', icon: LayoutTemplate },
+        { name: 'SEO & Metadata', href: '/admin/website/seo', icon: Globe },
+        { name: 'Media Library', href: '/admin/website/media', icon: Film },
+        { name: 'Publish History', href: '/admin/website/history', icon: History }
+      ]
+    },
+    {
       label: 'Commerce',
       items: [
         { name: 'Orders', href: '/admin/orders', icon: ShoppingCart, badge: unfulfilledOrders > 0 ? unfulfilledOrders : undefined },
@@ -82,15 +100,6 @@ export function AdminSidebar() {
         { name: 'Customer Reviews', href: '/admin/reviews', icon: Star },
         { name: 'Neria Girls (UGC)', href: '/admin/community', icon: HeartHandshake },
         { name: 'Newsletter Club', href: '/admin/newsletter', icon: Mail }
-      ]
-    },
-    {
-      label: 'Content Management',
-      items: [
-        { name: 'Homepage Sections', href: '/admin/content/homepage', icon: LayoutTemplate },
-        { name: 'Media Library', href: '/admin/media', icon: Film },
-        { name: 'Store Pages', href: '/admin/pages', icon: FileText },
-        { name: 'Navigation Menus', href: '/admin/navigation', icon: MenuIcon }
       ]
     },
     {

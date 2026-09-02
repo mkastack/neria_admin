@@ -315,3 +315,383 @@ export interface NotificationItem {
   read: boolean;
   actionUrl?: string;
 }
+
+// ==========================================
+// STOREFRONT NO-CODE CMS & WEBSITE EDITOR TYPES
+// ==========================================
+
+export type DeviceMode = 'desktop' | 'tablet' | 'mobile';
+
+export type SectionType = 
+  | 'hero' 
+  | 'new_arrivals' 
+  | 'categories' 
+  | 'featured_collection' 
+  | 'neria_girl' 
+  | 'best_sellers' 
+  | 'journal' 
+  | 'bunny_moment' 
+  | 'seen_in_neria' 
+  | 'newsletter'
+  | 'custom_banner'
+  | 'rich_text';
+
+export type BunnyMood = 
+  | 'default' 
+  | 'happy' 
+  | 'shopping' 
+  | 'sleeping' 
+  | 'love' 
+  | 'celebration' 
+  | 'empty_cart' 
+  | 'wishlist' 
+  | 'newsletter' 
+  | 'thank_you' 
+  | 'seasonal';
+
+export interface BunnyAsset {
+  id: string;
+  name: string;
+  mood: BunnyMood;
+  svgIcon?: string;
+  imageUrl: string;
+  category: string;
+  usedIn: string[];
+}
+
+export interface MediaAssetItem {
+  id: string;
+  name: string;
+  url: string;
+  type: 'image' | 'video' | 'icon' | 'bunny' | 'product' | 'campaign';
+  sizeBytes: number;
+  width: number;
+  height: number;
+  folder: string;
+  altText: string;
+  createdAt: string;
+  usedInCount: number;
+  usedInLocations: string[];
+}
+
+export interface AnnouncementItem {
+  id: string;
+  message: string;
+  emoji: string;
+  linkText?: string;
+  linkUrl?: string;
+  bgColor: string;
+  textColor: string;
+  active: boolean;
+  startDate?: string;
+  endDate?: string;
+  priority: number;
+}
+
+export interface NavDropdownItem {
+  id: string;
+  label: string;
+  url: string;
+  badge?: string;
+  image?: string;
+}
+
+export interface NavMenuItem {
+  id: string;
+  label: string;
+  url: string;
+  highlight?: boolean;
+  badge?: string;
+  isMegaMenu?: boolean;
+  featuredImage?: string;
+  featuredTitle?: string;
+  featuredSubtitle?: string;
+  dropdownItems?: NavDropdownItem[];
+}
+
+export interface PopupConfig {
+  id: string;
+  title: string;
+  subtitle: string;
+  badgeText?: string;
+  description: string;
+  image: string;
+  emoji: string;
+  bunnyMood: BunnyMood;
+  primaryButtonText: string;
+  primaryButtonLink: string;
+  secondaryButtonText?: string;
+  promoCode?: string;
+  bgColor: string;
+  textColor: string;
+  type: 'newsletter' | 'discount' | 'new_collection' | 'sale' | 'custom';
+  trigger: 'instant' | 'delay_5s' | 'scroll_50' | 'exit_intent';
+  frequency: 'every_visit' | 'once_per_day' | 'once_per_week' | 'once_ever';
+  active: boolean;
+}
+
+export interface HeroSectionContent {
+  smallLabel: string;
+  mainHeading: string;
+  headingEmoji: string;
+  description: string;
+  primaryButtonText: string;
+  primaryButtonLink: string;
+  secondaryButtonText: string;
+  secondaryButtonLink: string;
+  desktopImage: string;
+  mobileImage: string;
+  overlayOpacity: number;
+  textPosition: 'left' | 'center' | 'right';
+  verticalPosition: 'top' | 'center' | 'bottom';
+  headingColor: string;
+  descriptionColor: string;
+  buttonBgColor: string;
+  buttonTextColor: string;
+  badgeText: string;
+  bunnyMood: BunnyMood;
+  showBunny: boolean;
+}
+
+export interface ProductSectionContent {
+  heading: string;
+  subtitle: string;
+  sourceType: 'automatic' | 'manual' | 'collection';
+  automaticRule: 'newest' | 'bestsellers' | 'highest_rated' | 'featured';
+  selectedCollectionId?: string;
+  selectedProductIds: string[];
+  limit: number;
+  showPrice: boolean;
+  showColor: boolean;
+  showWishlist: boolean;
+  showQuickAdd: boolean;
+  showNewBadge: boolean;
+  ctaText?: string;
+  ctaLink?: string;
+}
+
+export interface CategoryItemConfig {
+  id: string;
+  name: string;
+  slug: string;
+  image: string;
+  itemCount: number;
+  badge?: string;
+  url: string;
+  visible: boolean;
+}
+
+export interface CategoriesSectionContent {
+  heading: string;
+  subtitle: string;
+  categories: CategoryItemConfig[];
+}
+
+export interface FeaturedCollectionSectionContent {
+  collectionLabel: string;
+  collectionName: string;
+  description: string;
+  primaryImage: string;
+  secondaryImage: string;
+  buttonText: string;
+  buttonLink: string;
+  bgColor: string;
+  textColor: string;
+  layout: 'image_left' | 'image_right' | 'full_width' | 'editorial_split';
+  bunnyMood: BunnyMood;
+  showBunny: boolean;
+}
+
+export interface NeriaGirlItem {
+  id: string;
+  imageUrl: string;
+  customerName: string;
+  handle: string;
+  caption: string;
+  taggedProduct?: string;
+  handwrittenNote?: string;
+}
+
+export interface NeriaGirlSectionContent {
+  heading: string;
+  subtitle: string;
+  tagline: string;
+  bunnyMood: BunnyMood;
+  items: NeriaGirlItem[];
+}
+
+export interface JournalArticleItem {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  coverImage: string;
+  category: string;
+  author: string;
+  publishDate: string;
+  readTime: string;
+  status: 'Published' | 'Draft' | 'Scheduled';
+}
+
+export interface JournalSectionContent {
+  heading: string;
+  subtitle: string;
+  articleIds: string[];
+}
+
+export interface BunnyMomentSectionContent {
+  heading: string;
+  message: string;
+  submessage: string;
+  bunnyMood: BunnyMood;
+  buttonText: string;
+  buttonLink: string;
+  bgColor: string;
+}
+
+export interface NewsletterSectionContent {
+  heading: string;
+  description: string;
+  inputPlaceholder: string;
+  buttonText: string;
+  successMessage: string;
+  bunnyMood: BunnyMood;
+  bgColor: string;
+  textColor: string;
+}
+
+export interface SectionConfig {
+  id: string;
+  name: string;
+  type: SectionType;
+  enabled: boolean;
+  position: number;
+  content: any; // Type safe casting per section type
+}
+
+export interface BrandSettingsConfig {
+  brandName: string;
+  tagline: string;
+  primaryLogoUrl: string;
+  secondaryLogoUrl: string;
+  faviconUrl: string;
+  bunnyLogoUrl: string;
+  socialHandles: {
+    instagram: string;
+    tiktok: string;
+    pinterest: string;
+    twitter: string;
+    youtube: string;
+    whatsapp: string;
+  };
+  contactInfo: {
+    email: string;
+    phone: string;
+    whatsapp: string;
+    location: string;
+    hours: string;
+  };
+}
+
+export interface ThemeColorsConfig {
+  primary: string; // Search blue / signature pink
+  secondary: string;
+  background: string;
+  surface: string;
+  text: string;
+  mutedText: string;
+  border: string;
+  accent: string;
+  success: string;
+  warning: string;
+  sale: string;
+  buttonBg: string;
+  buttonText: string;
+}
+
+export interface TypographyConfig {
+  headingFont: string;
+  bodyFont: string;
+  baseFontSize: number;
+  headingScale: 'compact' | 'normal' | 'large';
+  buttonCornerRadius: 'square' | 'rounded' | 'pill' | 'soft';
+}
+
+export interface FooterColumn {
+  id: string;
+  title: string;
+  links: Array<{ id: string; label: string; url: string }>;
+}
+
+export interface FooterConfig {
+  brandBio: string;
+  columns: FooterColumn[];
+  showNewsletter: boolean;
+  showSocials: boolean;
+  showPaymentMethods: boolean;
+  copyrightText: string;
+  bottomLinks: Array<{ id: string; label: string; url: string }>;
+}
+
+export interface PageBlock {
+  id: string;
+  type: 'heading' | 'text' | 'image' | 'image_text' | 'faq' | 'size_guide' | 'quote' | 'divider';
+  content: any;
+}
+
+export interface PageConfig {
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  status: 'Published' | 'Draft';
+  lastEdited: string;
+  blocks: PageBlock[];
+  seoTitle?: string;
+  seoDescription?: string;
+}
+
+export interface SEOConfig {
+  siteTitle: string;
+  titleTemplate: string;
+  defaultDescription: string;
+  ogImage: string;
+  keywords: string[];
+  googleSiteVerification?: string;
+}
+
+export interface PublishVersion {
+  id: string;
+  versionNumber: number;
+  publishedAt: string;
+  publishedBy: string;
+  changeSummary: string[];
+  configSnapshot: StorefrontConfig;
+}
+
+export interface StorefrontConfig {
+  brand: BrandSettingsConfig;
+  theme: {
+    colors: ThemeColorsConfig;
+    typography: TypographyConfig;
+  };
+  announcements: {
+    enabled: boolean;
+    autoRotate: boolean;
+    rotationInterval: number;
+    items: AnnouncementItem[];
+  };
+  navigation: {
+    logoText: string;
+    menuItems: NavMenuItem[];
+    searchPlaceholder: string;
+  };
+  homepageSections: SectionConfig[];
+  pages: PageConfig[];
+  popup: PopupConfig;
+  footer: FooterConfig;
+  seo: SEOConfig;
+  version: number;
+  lastUpdated: string;
+}

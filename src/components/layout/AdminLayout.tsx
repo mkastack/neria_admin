@@ -3,6 +3,7 @@
 import React from 'react';
 import { usePathname } from 'next/navigation';
 import { AdminProvider, useAdmin } from '@/src/lib/context/AdminContext';
+import { StorefrontCmsProvider } from '@/src/lib/context/StorefrontCmsContext';
 import { AdminSidebar } from './AdminSidebar';
 import { AdminHeader } from './AdminHeader';
 import { GlobalSearchModal } from '../ui/GlobalSearchModal';
@@ -18,7 +19,10 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
   // If on login or forgot-password page, do not render sidebar/header
   const isAuthPage = pathname === '/admin/login' || pathname === '/admin/forgot-password';
 
-  if (isAuthPage) {
+  // If in Visual Live Editor or Standalone Preview, render full-screen immersive canvas
+  const isImmersiveMode = pathname === '/admin/website/editor' || pathname?.startsWith('/preview');
+
+  if (isAuthPage || isImmersiveMode) {
     return (
       <main className="min-h-screen bg-[#FFF4F8]">
         {children}
@@ -61,7 +65,10 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <AdminProvider>
-      <AdminLayoutInner>{children}</AdminLayoutInner>
+      <StorefrontCmsProvider>
+        <AdminLayoutInner>{children}</AdminLayoutInner>
+      </StorefrontCmsProvider>
     </AdminProvider>
   );
 }
+
