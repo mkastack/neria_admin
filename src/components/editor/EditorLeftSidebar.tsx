@@ -75,6 +75,12 @@ const SINGLETON_DEFS = [
     dot: 'bg-[#263550]',
     children: 'footer' as const,
   },
+  {
+    id: 'brand',
+    label: 'Brand Identity',
+    icon: Sparkles,
+    dot: 'bg-[#FF4FA3]',
+  },
 ] as const;
 
 // Section ids that the live site shows in the "On this page" list

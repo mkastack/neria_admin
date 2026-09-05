@@ -9,6 +9,14 @@ import {
   AlignLeft, AlignCenter, AlignRight, Layers, Eye, Plus, Trash2,
   ExternalLink, RotateCcw, X, Check, ArrowRight, Link2
 } from 'lucide-react';
+import { ThemeInspector } from './ThemeInspector';
+import {
+  NavigationInspector,
+  AnnouncementsInspector,
+  PopupInspector,
+  FooterInspector,
+  BrandInspector,
+} from './SingletonsInspectors';
 
 export function EditorPropertyPanel() {
   const {
@@ -72,9 +80,11 @@ export function EditorPropertyPanel() {
             <h3 className="text-xs font-bold text-[#263550]">
               {selectedSection ? selectedSection.name : (
                 activeSectionId === 'navigation' ? 'Header Navigation' :
-                activeSectionId === 'announcements' ? 'Announcements' :
-                activeSectionId === 'theme' ? 'Theme Tokens' :
-                activeSectionId === 'footer' ? 'Storefront Footer' : 'Properties'
+                activeSectionId === 'announcements' ? 'Announcement Bar' :
+                activeSectionId === 'theme' ? 'Theme & Text Colors' :
+                activeSectionId === 'footer' ? 'Storefront Footer' :
+                activeSectionId === 'popup' ? 'Promotional Popup' :
+                activeSectionId === 'brand' ? 'Brand Settings' : 'Properties'
               )}
             </h3>
             <span className="text-[10px] text-[#98A0AE] uppercase tracking-wider">
@@ -93,15 +103,62 @@ export function EditorPropertyPanel() {
 
       {/* Inspector Body Controls */}
       <div className="flex-1 overflow-y-auto p-5 space-y-6 text-xs">
-        {/* Per-page text editor — every `data-cms-key="pg-<page>-<field>"`
-            attribute on the live storefront is editable here. The user
-            selects a single key from the left sidebar (or clicks the
-            element directly in the iframe), the field resolves to a
-            (page, field) pair via the same `pg-<page>-<field>` split
-            the commerce app uses, and we edit the matching
-            `config.pageText[page][field]` value. Edits round-trip back
-            to the iframe via `cms:apply` so the user sees the change
-            in real time without a reload. */}
+        {/* ======================================================== */}
+        {/* THEME & COLOR CONTROLS */}
+        {/* ======================================================== */}
+        {activeSectionId === 'theme' && (
+          <ThemeInspector
+            theme={config.theme}
+            updateThemeColors={updateThemeColors}
+            updateTypography={updateTypography}
+            onReset={resetThemeToPublished}
+          />
+        )}
+
+        {/* ======================================================== */}
+        {/* GLOBAL SINGLETON INSPECTORS */}
+        {/* ======================================================== */}
+        {activeSectionId === 'navigation' && (
+          <NavigationInspector
+            navigation={config.navigation}
+            updateNavigation={updateNavigation}
+            onReset={resetNavigationToPublished}
+          />
+        )}
+
+        {activeSectionId === 'announcements' && (
+          <AnnouncementsInspector
+            announcements={config.announcements}
+            updateAnnouncements={updateAnnouncements}
+            openEmojiPicker={openEmojiPicker}
+            onReset={resetAnnouncementsToPublished}
+          />
+        )}
+
+        {activeSectionId === 'popup' && (
+          <PopupInspector
+            popup={config.popup}
+            updatePopup={updatePopup}
+            onReset={resetPopupToPublished}
+          />
+        )}
+
+        {activeSectionId === 'footer' && (
+          <FooterInspector
+            footer={config.footer}
+            updateFooter={updateFooter}
+            onReset={resetFooterToPublished}
+          />
+        )}
+
+        {activeSectionId === 'brand' && (
+          <BrandInspector
+            brand={config.brand}
+            updateBrand={updateBrand}
+          />
+        )}
+
+        {/* Per-page text editor */}
         {isPerPageSection && (
           <PerPageTextEditor
             activeSectionId={activeSectionId}

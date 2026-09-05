@@ -299,7 +299,13 @@ export function IframeStorefrontCanvas({ className = '', initialPath = '/' }: Pr
       for (const [key, value] of Object.entries(cmsKeyToValue)) {
         win.postMessage({ type: 'cms:apply', key, value }, commerceUrl || '*');
       }
-    }, 200);
+      if (liveConfig?.theme) {
+        win.postMessage(
+          { type: 'cms:apply-theme', theme: liveConfig.theme },
+          commerceUrl || '*',
+        );
+      }
+    }, 100);
     return () => clearTimeout(handle);
   }, [cmsKeyToValue, isReady, commerceUrl]);
 
