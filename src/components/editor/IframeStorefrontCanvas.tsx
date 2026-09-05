@@ -105,7 +105,11 @@ export function IframeStorefrontCanvas({ className = '', initialPath = '/' }: Pr
   // React to the top-bar Sign-in/Sign-out toggle. The toggle writes a
   // localStorage flag in the iframe's context and (for sign-out)
   // reloads the iframe so the overlay's on-mount logic kicks in.
-  const commerceUrl = (process.env.NEXT_PUBLIC_COMMERCE_URL || '').replace(/\/$/, '');
+  const commerceUrl = (
+    process.env.NEXT_COMMERCE_URL ||
+    process.env.NEXT_PUBLIC_COMMERCE_URL ||
+    'https://neria-commerce.vercel.app'
+  ).replace(/\/$/, '');
 
   useEffect(() => {
     const onSetAuth = (e: Event) => {
@@ -318,10 +322,10 @@ export function IframeStorefrontCanvas({ className = '', initialPath = '/' }: Pr
         </div>
         <h3 className="text-sm font-bold text-[#263550] mb-1">Commerce URL not configured</h3>
         <p className="text-xs text-[#667085] max-w-sm mb-3">
-          Add <code className="font-mono text-[11px] bg-[#F8F8FA] px-1.5 py-0.5 rounded">NEXT_PUBLIC_COMMERCE_URL</code> to your <code className="font-mono text-[11px] bg-[#F8F8FA] px-1.5 py-0.5 rounded">.env.local</code> to load the live storefront here.
+          Add <code className="font-mono text-[11px] bg-[#F8F8FA] px-1.5 py-0.5 rounded">NEXT_COMMERCE_URL</code> to your <code className="font-mono text-[11px] bg-[#F8F8FA] px-1.5 py-0.5 rounded">.env.local</code> to load the live storefront here.
         </p>
         <p className="text-[11px] text-[#98A0AE] max-w-sm">
-          Example: <code className="font-mono">NEXT_PUBLIC_COMMERCE_URL=http://localhost:3000</code>
+          Example: <code className="font-mono">NEXT_COMMERCE_URL=http://localhost:3000</code>
         </p>
       </div>
     );

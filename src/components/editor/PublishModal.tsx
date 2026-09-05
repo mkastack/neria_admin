@@ -17,7 +17,11 @@ export function PublishModal() {
   const newVersion = (publishedConfig.version || 0) + 1;
   // Cache-buster so the merchant's browser always re-fetches the live
   // site after a publish — even if their other tab was already open.
-  const commerceBase = (process.env.NEXT_PUBLIC_COMMERCE_URL || '').replace(/\/$/, '');
+  const commerceBase = (
+    process.env.NEXT_COMMERCE_URL ||
+    process.env.NEXT_PUBLIC_COMMERCE_URL ||
+    'https://neria-commerce.vercel.app'
+  ).replace(/\/$/, '');
   const viewLiveHref = commerceBase
     ? `${commerceBase}/?v=${newVersion}-${Date.now()}`
     : '/admin/website';
