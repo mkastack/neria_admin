@@ -36,13 +36,15 @@ export function PublishModal() {
     warnings.push('No announcement bar is currently marked active.');
   }
 
-  const handlePublish = () => {
+  const handlePublish = async () => {
     setIsSubmitting(true);
-    setTimeout(() => {
-      publishChanges(publishNotes);
+    try {
+      await publishChanges(publishNotes);
+    } catch {
+      // Handled in publishChanges with toast notification
+    } finally {
       setIsSubmitting(false);
-      setIsPublishModalOpen(false);
-    }, 600);
+    }
   };
 
   return (

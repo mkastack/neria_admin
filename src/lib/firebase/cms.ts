@@ -56,11 +56,16 @@ export function useStorefrontConfig(): {
   return { config, loading };
 }
 
+function sanitizeForFirestore<T>(data: T): T {
+  return JSON.parse(JSON.stringify(data));
+}
+
 export async function saveStorefrontConfig(
   config: StorefrontConfig,
 ): Promise<void> {
+  const sanitized = sanitizeForFirestore(config);
   await setDoc(doc(db, "cms", "config"), {
-    ...config,
+    ...sanitized,
     lastUpdated: serverTimestamp(),
   });
 }
@@ -98,9 +103,10 @@ export async function appendPublishHistory(version: PublishVersion): Promise<voi
   const existing = snap.exists()
     ? (snap.data() as { items?: PublishVersion[] }).items ?? []
     : [];
+  const cleanedVersion = sanitizeForFirestore(version);
   await setDoc(
     ref,
-    { items: [version, ...existing].slice(0, 50) },
+    { items: [cleanedVersion, ...existing].slice(0, 50) },
     { merge: true },
   );
 }
