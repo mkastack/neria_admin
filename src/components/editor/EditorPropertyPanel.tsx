@@ -1192,8 +1192,18 @@ function PerPageTextEditor({
       })()
     : null;
 
+  const camelField = split
+    ? split.field.replace(/-([a-z0-9])/g, (_, c) => c.toUpperCase())
+    : '';
+  const kebabField = split
+    ? split.field.replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, '$1-$2').toLowerCase()
+    : '';
+
   const currentValue = split
-    ? pageText?.[split.page]?.[split.field] ?? ''
+    ? pageText?.[split.page]?.[split.field] ??
+      pageText?.[split.page]?.[camelField] ??
+      pageText?.[split.page]?.[kebabField] ??
+      ''
     : '';
 
   // Push a `cms:apply` message to the iframe when the value changes so

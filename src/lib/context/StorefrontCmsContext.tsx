@@ -867,19 +867,28 @@ export function StorefrontCmsProvider({
 
   // Per-page text mutator: every `data-cms-key="pg-<page>-<field>"`
   // attribute on the live storefront reads from
-  // `config.pageText?.[page]?.[field]`. We merge into the existing
-  // `pageText` object so we never blow away siblings when the user is
-  // editing one field. Empty string is treated as "delete" so the live
-  // site falls back to its hardcoded default.
+  // `config.pageText?.[page]?.[field]` (often camelCase in JSX, e.g. `brandItalic`).
+  // We automatically compute and write BOTH camelCase and kebab-case keys into
+  // the pageText dictionary so any consumer resolves instantly in real time.
   const updatePageText = useCallback(
     (page: keyof PageTextConfig, field: string, value: string) => {
+      const camelField = field.replace(/-([a-z0-9])/g, (_, c) => c.toUpperCase());
+      const kebabField = field.replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, '$1-$2').toLowerCase();
+
       updateConfig((prev) => {
         const prevPage = prev.pageText?.[page] ?? {};
-        const nextPage = { ...prevPage, [field]: value };
-        // If value is empty, drop the key so the live site falls back
-        // to its hardcoded string.
+        const nextPage = {
+          ...prevPage,
+          [field]: value,
+          [camelField]: value,
+          [kebabField]: value,
+        };
+        // If value is empty, drop all key variants so the live site
+        // falls back to its hardcoded string.
         if (value === "") {
           delete (nextPage as Record<string, string>)[field];
+          delete (nextPage as Record<string, string>)[camelField];
+          delete (nextPage as Record<string, string>)[kebabField];
         }
         return {
           ...prev,
@@ -1216,17 +1225,33 @@ export function StorefrontCmsProvider({
         },
       };
       try {
-        await saveStorefrontConfig({
-          ...config,
-          version: newVersionNumber,
-          lastUpdated: new Date().toISOString(),
-        });
+        // Deep clone and normalize all pageText entries with both camelCase and kebab-case
+        const configToSave: StorefrontConfig = JSON.parse(JSON.stringify(config));
+        configToSave.version = newVersionNumber;
+        configToSave.lastUpdated = new Date().toISOString();
+
+        if (configToSave.pageText) {
+          const pageRecord = configToSave.pageText as Record<string, Record<string, string> | undefined>;
+          for (const page of Object.keys(pageRecord)) {
+            const pageObj = pageRecord[page];
+            if (pageObj && typeof pageObj === "object") {
+              const entries = Object.entries(pageObj);
+              for (const [k, v] of entries) {
+                if (typeof v === "string") {
+                  const camel = k.replace(/-([a-z0-9])/g, (_: string, c: string) => c.toUpperCase());
+                  const kebab = k.replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, "$1-$2").toLowerCase();
+                  pageObj[camel] = v;
+                  pageObj[kebab] = v;
+                }
+              }
+            }
+          }
+        }
+
+        await saveStorefrontConfig(configToSave);
         await appendPublishHistory(newVersion);
-        setPublishedConfig({
-          ...config,
-          version: newVersionNumber,
-          lastUpdated: new Date().toISOString(),
-        });
+        setPublishedConfig(configToSave);
+        setConfig(configToSave);
         setPublishHistory((prev) => [newVersion, ...prev]);
         setIsDirty(false);
         setIsPublishModalOpen(false);
