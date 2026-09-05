@@ -118,6 +118,16 @@ export async function createProduct(p: Omit<Product, "id">): Promise<string> {
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   });
+  // Fire a real-time notification so the admin bell updates instantly
+  try {
+    const { createAdminNotification } = await import("./notifications");
+    await createAdminNotification({
+      category: "Inventory",
+      title: `New product added: ${p.name}`,
+      description: `"${p.name}" is now live on the storefront.`,
+      actionUrl: `/admin/products/${ref.id}`,
+    });
+  } catch (_) { /* non-critical */ }
   return ref.id;
 }
 

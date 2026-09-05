@@ -12,6 +12,11 @@ import { useActivityLogs } from "@/src/lib/firebase/activity";
 import { useCategories } from "@/src/lib/firebase/categories";
 import { useMediaAssets } from "@/src/lib/firebase/media";
 import {
+  useAdminNotifications,
+  markNotificationReadInDB,
+  markAllNotificationsReadInDB,
+} from "@/src/lib/firebase/notifications";
+import {
   mockGiftCards,
   mockTransactions,
   mockRefunds,
@@ -24,7 +29,6 @@ import {
   mockNewsletterSubscribers,
   mockStaff,
   mockDiscounts,
-  mockNotifications,
 } from "@/src/lib/mock-data";
 import {
   type Order,
@@ -194,7 +198,9 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   const [communityPosts, setCommunityPosts] = useState<CommunityPost[]>(mockCommunityPosts);
   const [newsletterSubscribers, setNewsletterSubscribers] = useState<NewsletterSubscriber[]>(mockNewsletterSubscribers);
   const [staff, setStaff] = useState<StaffMember[]>(mockStaff);
-  const [notifications, setNotifications] = useState<NotificationItem[]>(mockNotifications);
+  const { notifications, loading: notificationsLoading } = useAdminNotifications(30);
+  // setNotifications kept for context compat — mutations go through Firestore helpers
+  const setNotifications: React.Dispatch<React.SetStateAction<NotificationItem[]>> = () => {};
 
   const showLoader = (message = "Saving your changes…") => {
     setLoaderMessage(message);
@@ -219,10 +225,10 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   const removeToast = (id: string) => setToasts((p) => p.filter((t) => t.id !== id));
 
   const markNotificationAsRead = (id: string) => {
-    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
+    markNotificationReadInDB(id).catch(console.error);
   };
   const markAllNotificationsRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    markAllNotificationsReadInDB().catch(console.error);
     addToast({ type: "info", title: "Notifications Cleared", description: "All notifications marked as read." });
   };
 

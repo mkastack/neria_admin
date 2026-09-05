@@ -13,7 +13,7 @@ import {
   where,
   type DocumentData,
 } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { db } from "./client";
 import type {
   DeliveryMethod,
@@ -172,12 +172,41 @@ export async function listOrders(): Promise<Order[]> {
 export function useOrders(): { orders: Order[]; loading: boolean } {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  // Track seen order IDs so we can detect genuinely new orders
+  const seenIds = useState<Set<string>>(() => new Set())[0];
+  const isFirstLoad = useRef(true);
+
   useEffect(() => {
     const unsub = onSnapshot(
       query(collection(db, "orders"), orderBy("createdAt", "desc")),
-      (snap) => {
-        setOrders(snap.docs.map((d) => toOrder(d.id, d.data())));
+      async (snap) => {
+        const newOrders = snap.docs.map((d) => toOrder(d.id, d.data()));
+
+        // Detect new orders (not seen before) after the first load
+        if (!isFirstLoad.current) {
+          const brandNew = newOrders.filter((o) => !seenIds.has(o.id));
+          if (brandNew.length > 0) {
+            try {
+              const { createAdminNotification } = await import("./notifications");
+              for (const o of brandNew) {
+                await createAdminNotification({
+                  category: "Orders",
+                  title: `New order ${o.orderNumber}`,
+                  description: `${o.customer.name} placed an order totalling $${o.total.toLocaleString()}.`,
+                  actionUrl: `/admin/orders/${o.id}`,
+                });
+              }
+            } catch (_) { /* non-critical */ }
+          }
+        }
+
+        // Update seen IDs
+        newOrders.forEach((o) => seenIds.add(o.id));
+        isFirstLoad.current = false;
+
+        setOrders(newOrders);
         setLoading(false);
+
       },
       () => setLoading(false),
     );

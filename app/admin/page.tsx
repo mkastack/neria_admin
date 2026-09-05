@@ -15,14 +15,33 @@ import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell
 } from 'recharts';
-import { mockRevenueTrend, mockSalesByCategory, mockLiveFeed } from '@/src/lib/mock-data';
+import { mockRevenueTrend, mockSalesByCategory } from '@/src/lib/mock-data';
 
 export default function AdminDashboardPage() {
-  const { orders, products, fulfillOrder, addToast } = useAdmin();
+  const { orders, products, customers, fulfillOrder, addToast } = useAdmin();
   const [chartTimeframe, setChartTimeframe] = useState<'7D' | '30D' | '90D' | '1Y'>('7D');
   const [dateRange, setDateRange] = useState<string>('Aug 22 - Aug 28, 2026');
 
   const recentOrders = orders.slice(0, 5);
+
+  // ── Live KPI stats computed from real Firestore orders ──
+  const totalRevenue = orders
+    .filter((o) => o.paymentStatus === 'Paid')
+    .reduce((sum, o) => sum + o.total, 0);
+  const totalOrders = orders.length;
+  const activeCustomers = customers.length;
+  const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+  // Estimate net profit as ~58 % of revenue (typical fashion margin)
+  const netProfit = totalRevenue * 0.58;
+
+  // ── Real live feed from 10 most recent orders ──
+  const liveFeed = orders.slice(0, 10).map((o) => ({
+    id: o.id,
+    text: `${o.customer.name} placed order ${o.orderNumber} — $${o.total.toLocaleString()}`,
+    time: o.createdAt
+      ? new Date(o.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      : 'just now',
+  }));
 
   const handleDownloadReport = () => {
     addToast({
@@ -81,7 +100,7 @@ export default function AdminDashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
         <StatCard
           title="Total Revenue"
-          value="$ 48,920"
+          value={`$ ${totalRevenue.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
           change="+12.8%"
           isPositive={true}
           theme="pink"
@@ -91,7 +110,7 @@ export default function AdminDashboardPage() {
         />
         <StatCard
           title="Total Orders"
-          value="142"
+          value={String(totalOrders)}
           change="+8.4%"
           isPositive={true}
           theme="white"
@@ -101,7 +120,7 @@ export default function AdminDashboardPage() {
         />
         <StatCard
           title="Active Customers"
-          value="1,280"
+          value={activeCustomers.toLocaleString()}
           change="+14.2%"
           isPositive={true}
           theme="blue"
@@ -121,7 +140,7 @@ export default function AdminDashboardPage() {
         />
         <StatCard
           title="Average Order"
-          value="$ 445"
+          value={`$ ${avgOrderValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
           change="+4.1%"
           isPositive={true}
           theme="cream"
@@ -131,7 +150,7 @@ export default function AdminDashboardPage() {
         />
         <StatCard
           title="Net Profit"
-          value="$ 28,450"
+          value={`$ ${netProfit.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
           change="+11.5%"
           isPositive={true}
           theme="white"
@@ -420,15 +439,22 @@ export default function AdminDashboardPage() {
             </div>
 
             <div className="space-y-3">
-              {mockLiveFeed.map((item) => (
-                <div key={item.id} className="flex items-start gap-2.5 text-xs p-2.5 rounded-xl bg-[#FFF4F8]/50 border border-[#FFD8EA]/40">
-                  <Sparkles className="w-3.5 h-3.5 text-[#FF4FA3] shrink-0 mt-0.5" />
-                  <div className="flex-1">
-                    <p className="text-[#344054] leading-tight font-medium">{item.text}</p>
-                    <span className="text-[10px] text-[#98A0AE] mt-0.5 block">{item.time}</span>
-                  </div>
+              {liveFeed.length === 0 ? (
+                <div className="text-center py-4">
+                  <Sparkles className="w-6 h-6 text-[#FFD8EA] mx-auto mb-1" />
+                  <p className="text-xs text-[#98A0AE]">Waiting for store activity…</p>
                 </div>
-              ))}
+              ) : (
+                liveFeed.map((item) => (
+                  <div key={item.id} className="flex items-start gap-2.5 text-xs p-2.5 rounded-xl bg-[#FFF4F8]/50 border border-[#FFD8EA]/40">
+                    <Sparkles className="w-3.5 h-3.5 text-[#FF4FA3] shrink-0 mt-0.5" />
+                    <div className="flex-1">
+                      <p className="text-[#344054] leading-tight font-medium">{item.text}</p>
+                      <span className="text-[10px] text-[#98A0AE] mt-0.5 block">{item.time}</span>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>
