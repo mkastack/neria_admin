@@ -81,7 +81,7 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
         <div className="grid grid-cols-3 gap-4 text-center border-t md:border-t-0 md:border-l border-[#F2F3F5] pt-4 md:pt-0 md:pl-6">
           <div>
             <span className="text-[11px] text-[#98A0AE] font-semibold uppercase">Lifetime Spent</span>
-            <p className="text-lg font-extrabold text-[#FF4FA3]">GH₵ {customer.totalSpent.toLocaleString()}</p>
+            <p className="text-lg font-extrabold text-[#FF4FA3]">$ {customer.totalSpent.toLocaleString()}</p>
           </div>
           <div>
             <span className="text-[11px] text-[#98A0AE] font-semibold uppercase">Completed Orders</span>
@@ -120,7 +120,7 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
                   <div className="flex items-center gap-3">
                     <StatusBadge status={ord.paymentStatus} />
                     <StatusBadge status={ord.fulfillmentStatus} />
-                    <span className="text-sm font-bold text-[#263550]">GH₵ {ord.total}</span>
+                    <span className="text-sm font-bold text-[#263550]">$ {ord.total}</span>
                   </div>
                 </div>
               ))}

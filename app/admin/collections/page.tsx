@@ -107,7 +107,7 @@ export default function CollectionsPage() {
                   </div>
                   <div>
                     <span className="text-[#98A0AE]">Revenue</span>
-                    <p className="font-bold text-[#FF4FA3]">GH₵ {col.revenue.toLocaleString()}</p>
+                    <p className="font-bold text-[#FF4FA3]">$ {col.revenue.toLocaleString()}</p>
                   </div>
                 </div>
               </div>

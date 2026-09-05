@@ -216,18 +216,18 @@ export const initialJournalArticles: JournalArticleItem[] = [
     id: 'art-2',
     title: 'Behind the Seams: The Making of the Blue Hour Capsule',
     slug: 'behind-the-seams-blue-hour',
-    excerpt: 'A glimpse into the artisan atelier in Accra, curating custom organic cottons and bespoke ribbon finishes.',
-    content: 'Every stitch in our Blue Hour drop was selected to flatter all silhouettes while upholding sustainable atelier craftsmanship in West Africa.',
+    excerpt: 'A glimpse into our design studio in New York, curating custom organic cottons and bespoke ribbon finishes.',
+    content: 'Every stitch in our Blue Hour drop was selected to flatter all silhouettes while upholding sustainable atelier craftsmanship and small-batch production.',
     coverImage: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=900&q=80',
     category: 'Atelier Stories',
-    author: 'Ama Osei',
+    author: 'Avery Osei',
     publishDate: 'Aug 24, 2026',
     readTime: '6 min read',
     status: 'Published'
   },
   {
     id: 'art-3',
-    title: 'Neria Girls Around the Globe: Copenhagen to Accra',
+    title: 'Neria Girls Around the Globe: New York to Los Angeles',
     slug: 'neria-girls-globe',
     excerpt: 'How our community pairs high-waist pleats with oversized knits across four fashion capitals.',
     content: 'Street style snapshots from girls wearing Neria with unbothered confidence, chunky loafers, and signature bunny pins.',
@@ -254,14 +254,14 @@ export const defaultStorefrontConfig: StorefrontConfig = {
       pinterest: 'https://pinterest.com/neriacollective',
       twitter: 'https://twitter.com/neriacollective',
       youtube: 'https://youtube.com/@neriacollective',
-      whatsapp: 'https://wa.me/233240000000'
+      whatsapp: 'https://wa.me/12125550100'
     },
     contactInfo: {
       email: 'care@neriacollective.com',
-      phone: '+233 24 123 4567',
-      whatsapp: '+233 55 987 6543',
-      location: 'Airport Residential Area, Accra, Ghana',
-      hours: 'Mon — Sat: 9:00 AM — 7:00 PM GMT'
+      phone: '+1 (212) 555-0100',
+      whatsapp: '+1 (212) 555-0101',
+      location: '226 W 26th St, New York, NY 10001, USA',
+      hours: 'Mon — Sat: 9:00 AM — 7:00 PM EST'
     }
   },
   theme: {
@@ -295,7 +295,7 @@ export const defaultStorefrontConfig: StorefrontConfig = {
     items: [
       {
         id: 'ann-1',
-        message: 'New pieces just landed ♡ Free delivery on orders over GH₵ 500',
+        message: 'New pieces just landed ♡ Free delivery on orders over $500',
         emoji: '♡',
         linkText: 'Shop New Arrivals',
         linkUrl: '/admin/website/editor?page=shop',
@@ -394,7 +394,7 @@ export const defaultStorefrontConfig: StorefrontConfig = {
         smallLabel: 'Neria Summer Capsule Drop 04',
         mainHeading: 'Soft looks. Loud presence.',
         headingEmoji: '♡',
-        description: 'Thoughtfully tailored essentials designed to feel effortless, sweet, and unforgettable. Curated in Accra with global softness.',
+        description: 'Thoughtfully tailored essentials designed to feel effortless, sweet, and unforgettable. Designed in New York with global softness.',
         primaryButtonText: 'Shop New Arrivals',
         primaryButtonLink: '/shop',
         secondaryButtonText: 'Explore Lookbook',
@@ -511,8 +511,8 @@ export const defaultStorefrontConfig: StorefrontConfig = {
           {
             id: 'ugc-1',
             imageUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&q=80',
-            customerName: 'Ama Boateng',
-            handle: '@amaboateng',
+            customerName: 'Avery Boateng',
+            handle: '@averyboateng',
             caption: 'The way this blue dress moves in the breeze is everything 🩵',
             taggedProduct: 'Cloud Mini Dress in Sky',
             handwrittenNote: '10/10 fit ♡'
@@ -520,16 +520,16 @@ export const defaultStorefrontConfig: StorefrontConfig = {
           {
             id: 'ugc-2',
             imageUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600&q=80',
-            customerName: 'Kiki Mensah',
-            handle: '@kikimensah',
-            caption: 'Neria set for weekend brunch in Cantonments 🌸',
+            customerName: 'Kiki Marshall',
+            handle: '@kikimarshall',
+            caption: 'Neria set for weekend brunch in SoHo 🌸',
             taggedProduct: 'Silk Linen Pleated Set',
             handwrittenNote: 'Obsessed with the fabric!'
           },
           {
             id: 'ugc-3',
             imageUrl: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=600&q=80',
-            customerName: 'Sena Adjei',
+            customerName: 'Sena Bell',
             handle: '@sena.style',
             caption: 'Golden hour in my favorite corset top ✨',
             taggedProduct: 'Soft Boned Satin Corset',
@@ -538,8 +538,8 @@ export const defaultStorefrontConfig: StorefrontConfig = {
           {
             id: 'ugc-4',
             imageUrl: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=600&q=80',
-            customerName: 'Dentaa O.',
-            handle: '@dentaa_o',
+            customerName: 'Dani O.',
+            handle: '@dani_o',
             caption: 'Unboxing day! The bunny packaging melted my heart 🐰',
             taggedProduct: 'Signature Ribbon Tote',
             handwrittenNote: 'Cutest package ever'
@@ -568,7 +568,7 @@ export const defaultStorefrontConfig: StorefrontConfig = {
       content: {
         heading: 'Made for your softest era. 🐰',
         message: 'Every Neria Collective order arrives in our signature pink keepsake box, complete with handwritten care notes and an exclusive enamel bunny pin.',
-        submessage: 'Free luxury gift wrapping included on all orders over GH₵ 800.',
+        submessage: 'Free luxury gift wrapping included on all orders over $800.',
         bunnyMood: 'celebration',
         buttonText: 'Discover Our Brand Story',
         buttonLink: '/about',
@@ -621,8 +621,8 @@ export const defaultStorefrontConfig: StorefrontConfig = {
       description: 'The philosophy of Neria Collective: redefining modern femininity through softness and power.',
       status: 'Published',
       lastEdited: '2026-08-28',
-      seoTitle: 'Our Story — Neria Collective Atelier Accra',
-      seoDescription: 'Discover the heart behind Neria Collective, our commitment to artisanal African craftsmanship and soft luxury aesthetics.',
+      seoTitle: 'Our Story — Neria Collective Atelier New York',
+      seoDescription: 'Discover the heart behind Neria Collective, our commitment to artisanal small-batch craftsmanship and soft luxury aesthetics.',
       blocks: [
         {
           id: 'blk-1',
@@ -638,8 +638,8 @@ export const defaultStorefrontConfig: StorefrontConfig = {
           id: 'blk-3',
           type: 'image_text',
           content: {
-            heading: 'Crafted in Accra with Global Softness',
-            text: 'Every collection is engineered in our Accra atelier in small batches to eliminate textile waste and preserve artisanal tailoring quality.',
+            heading: 'Crafted in New York with Global Softness',
+            text: 'Every collection is engineered in our New York studio in small batches to eliminate textile waste and preserve artisanal tailoring quality.',
             image: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1000&q=80',
             layout: 'image_left'
           }
@@ -684,10 +684,10 @@ export const defaultStorefrontConfig: StorefrontConfig = {
           content: {
             category: 'Orders & Payments',
             items: [
-              { question: 'What payment methods do you accept?', answer: 'We accept MTN Mobile Money, Telecel Cash, Visa, Mastercard, and Bank Wire transfers.' },
-              { question: 'Can I cancel or modify my order after placing it?', answer: 'Orders are processed quickly within 2 hours. Please contact our WhatsApp concierge promptly if you need changes.' },
-              { question: 'How long does delivery take in Accra?', answer: 'Same-day or next-day delivery via our dedicated dispatched riders across Greater Accra.' },
-              { question: 'Do you ship internationally?', answer: 'Yes! We ship worldwide via DHL Express with tracking in 3-5 business days.' }
+              { question: 'What payment methods do you accept?', answer: 'We accept Visa, Mastercard, American Express, Apple Pay, Google Pay, Shop Pay, and PayPal — all processed securely through Stripe.' },
+              { question: 'Can I cancel or modify my order after placing it?', answer: 'Orders are processed quickly within 2 hours. Please contact our client concierge promptly if you need changes.' },
+              { question: 'How long does delivery take in the US?', answer: 'Standard shipping arrives in 3–5 business days. Express overnight is available at checkout for most US ZIP codes.' },
+              { question: 'Do you ship internationally?', answer: 'Yes! We ship worldwide via DHL Express with tracking in 3–5 business days.' }
             ]
           }
         }
@@ -723,7 +723,7 @@ export const defaultStorefrontConfig: StorefrontConfig = {
       status: 'Published',
       lastEdited: '2026-08-15',
       seoTitle: 'Size Guide & Measurements — Neria Collective',
-      seoDescription: 'Find your perfect fit with our comprehensive UK/US size conversion chart.',
+      seoDescription: 'Find your perfect fit with our comprehensive US size conversion chart.',
       blocks: [
         {
           id: 'blk-sg1',
@@ -731,11 +731,11 @@ export const defaultStorefrontConfig: StorefrontConfig = {
           content: {
             category: 'Dresses & Tops',
             rows: [
-              { size: 'XS (UK 6)', bust: '31 - 32"', waist: '24 - 25"', hips: '34 - 35"' },
-              { size: 'S (UK 8)', bust: '33 - 34"', waist: '26 - 27"', hips: '36 - 37"' },
-              { size: 'M (UK 10)', bust: '35 - 36"', waist: '28 - 29"', hips: '38 - 39"' },
-              { size: 'L (UK 12)', bust: '37 - 39"', waist: '30 - 32"', hips: '40 - 42"' },
-              { size: 'XL (UK 14)', bust: '40 - 42"', waist: '33 - 35"', hips: '43 - 45"' }
+              { size: 'XS (US 0)', bust: '31 - 32"', waist: '24 - 25"', hips: '34 - 35"' },
+              { size: 'S (US 2)', bust: '33 - 34"', waist: '26 - 27"', hips: '36 - 37"' },
+              { size: 'M (US 4)', bust: '35 - 36"', waist: '28 - 29"', hips: '38 - 39"' },
+              { size: 'L (US 6)', bust: '37 - 39"', waist: '30 - 32"', hips: '40 - 42"' },
+              { size: 'XL (US 8)', bust: '40 - 42"', waist: '33 - 35"', hips: '43 - 45"' }
             ]
           }
         }
@@ -743,11 +743,11 @@ export const defaultStorefrontConfig: StorefrontConfig = {
     }
   ],
   footer: {
-    brandBio: 'Neria Collective is an Accra-born soft luxury womenswear label crafting modern silhouettes for unapologetic presence.',
+    brandBio: 'Neria Collective is a New York–based soft luxury womenswear label crafting modern silhouettes for unapologetic presence.',
     showNewsletter: true,
     showSocials: true,
     showPaymentMethods: true,
-    copyrightText: '© 2026 Neria Collective Ltd. All rights reserved. Made with love in Ghana ♡',
+    copyrightText: '© 2026 Neria Collective Inc. All rights reserved. Made with love in New York ♡',
     columns: [
       {
         id: 'col-shop',
@@ -792,12 +792,18 @@ export const defaultStorefrontConfig: StorefrontConfig = {
   seo: {
     siteTitle: 'Neria Collective — Soft Looks. Loud Presence.',
     titleTemplate: '%s | Neria Collective',
-    defaultDescription: 'Shop soft luxury silhouettes, corsets, matching silk sets, and viral dresses designed in Accra for women with commanding presence.',
+    defaultDescription: 'Shop soft luxury silhouettes, corsets, matching silk sets, and viral dresses designed in New York for women with commanding presence.',
     ogImage: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1200&q=85',
-    keywords: ['neria collective', 'women fashion ghana', 'soft girl fashion', 'silk sets accra', 'corset dress', 'luxury womenswear']
+    keywords: ['neria collective', 'women fashion usa', 'soft girl fashion', 'silk sets new york', 'corset dress', 'luxury womenswear']
   },
+  /**
+   * Per-page editable text. Mirrors `neria_commerce/app/lib/firebase/cms.ts`
+   * `PageTextConfig`. Empty by default — the admin's editor pushes
+   * values here when the user clicks and types in the property panel.
+   */
+  pageText: {},
   version: 28,
-  lastUpdated: '2026-09-02 05:00 GMT'
+  lastUpdated: '2026-09-02 05:00 EST'
 };
 
 export const initialPublishHistory: PublishVersion[] = [
@@ -805,7 +811,7 @@ export const initialPublishHistory: PublishVersion[] = [
     id: 'ver-28',
     versionNumber: 28,
     publishedAt: 'Sep 2, 2026 at 04:30 AM',
-    publishedBy: 'Ama Osei (Super Admin)',
+    publishedBy: 'Avery Osei (Super Admin)',
     changeSummary: [
       'Updated Homepage Hero Heading to "Soft looks. Loud presence. ♡"',
       'Added Blue Hour Capsule promotion banner to Announcement bar',
@@ -818,7 +824,7 @@ export const initialPublishHistory: PublishVersion[] = [
     id: 'ver-27',
     versionNumber: 27,
     publishedAt: 'Aug 26, 2026 at 11:15 AM',
-    publishedBy: 'Michael Addo (Store Manager)',
+    publishedBy: 'Michael Addison (Store Manager)',
     changeSummary: [
       'Activated 15% discount popup modal with code SOFTGIRL15',
       'Configured 4 featured products in New Arrivals section',
@@ -830,7 +836,7 @@ export const initialPublishHistory: PublishVersion[] = [
     id: 'ver-26',
     versionNumber: 26,
     publishedAt: 'Aug 18, 2026 at 09:00 PM',
-    publishedBy: 'Ama Osei (Super Admin)',
+    publishedBy: 'Avery Osei (Super Admin)',
     changeSummary: [
       'Launched Summer Drop 04 collection spotlight',
       'Updated footer contact phone and WhatsApp concierge hours'

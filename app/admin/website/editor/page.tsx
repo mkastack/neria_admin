@@ -5,7 +5,7 @@ import { useStorefrontCms } from '@/src/lib/context/StorefrontCmsContext';
 import { EditorTopBar } from '@/src/components/editor/EditorTopBar';
 import { EditorLeftSidebar } from '@/src/components/editor/EditorLeftSidebar';
 import { EditorPropertyPanel } from '@/src/components/editor/EditorPropertyPanel';
-import { StorefrontRenderer } from '@/src/components/storefront/StorefrontRenderer';
+import { IframeStorefrontCanvas } from '@/src/components/editor/IframeStorefrontCanvas';
 import { EmojiPickerModal } from '@/src/components/editor/EmojiPickerModal';
 import { BunnyPickerModal } from '@/src/components/editor/BunnyPickerModal';
 import { MediaPickerModal } from '@/src/components/editor/MediaPickerModal';
@@ -15,9 +15,9 @@ export default function VisualEditorPage() {
   const { deviceMode, previewMode } = useStorefrontCms();
 
   const viewportWidthClass = {
-    desktop: 'w-full max-w-[1440px]',
-    tablet: 'w-[768px] max-w-full my-6 rounded-3xl shadow-2xl border-8 border-[#263550] overflow-hidden',
-    mobile: 'w-[390px] max-w-full my-6 rounded-[40px] shadow-2xl border-10 border-[#263550] overflow-hidden ring-4 ring-black/10'
+    desktop: 'w-full max-w-[1440px] h-full',
+    tablet: 'w-[768px] max-w-full h-full my-6 rounded-3xl shadow-2xl border-8 border-[#263550] overflow-hidden',
+    mobile: 'w-[390px] max-w-full h-full my-6 rounded-[40px] shadow-2xl border-10 border-[#263550] overflow-hidden ring-4 ring-black/10'
   }[deviceMode];
 
   return (
@@ -30,10 +30,10 @@ export default function VisualEditorPage() {
         {/* Left Toolbar / Section Hierarchy */}
         {!previewMode && <EditorLeftSidebar />}
 
-        {/* Center Live Website Canvas */}
-        <div className="flex-1 bg-[#101828]/30 overflow-y-auto flex flex-col items-center relative p-0 sm:p-4 transition-all">
-          <div className={`${viewportWidthClass} bg-white shadow-xl transition-all duration-300 min-h-full flex flex-col`}>
-            <StorefrontRenderer isEditorMode={true} />
+        {/* Center Live Website Canvas — now an iframe of the real commerce site */}
+        <div className="flex-1 bg-[#101828]/30 overflow-hidden flex flex-col items-stretch relative p-0 sm:p-4 transition-all">
+          <div className={`${viewportWidthClass} bg-white shadow-xl transition-all duration-300 flex flex-col`}>
+            <IframeStorefrontCanvas initialPath="/" />
           </div>
         </div>
 

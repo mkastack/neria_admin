@@ -22,7 +22,7 @@ export default function HomepageContentPage() {
   const { addToast } = useAdmin();
 
   const [blocks, setBlocks] = useState<HomepageBlock[]>([
-    { id: 'b-1', name: 'Hero Carousel', type: 'Hero Banner', heading: 'Soft Girl & Romantic Silhouettes', subtitle: 'Handcrafted luxury apparel designed in Accra', visible: true, theme: 'Blush Pink' },
+    { id: 'b-1', name: 'Hero Carousel', type: 'Hero Banner', heading: 'Soft Girl & Romantic Silhouettes', subtitle: 'Handcrafted luxury apparel designed in New York', visible: true, theme: 'Blush Pink' },
     { id: 'b-2', name: 'Shop Your Pretty (Categories)', type: 'Category Grid', heading: 'Shop by Lookbook', subtitle: 'Curated by aesthetic styles', visible: true, theme: 'White' },
     { id: 'b-3', name: 'New Arrivals Drop', type: 'Product Slider', heading: 'Fresh off the Runway', subtitle: 'Limited edition weekly pieces', visible: true, theme: 'Blush' },
     { id: 'b-4', name: "Bunny's Picks", type: 'Curated Collection', heading: "Bunny's Favorite Soft Knits", subtitle: 'Signature fleece and plush ear hoodies', visible: true, theme: 'Pink Ribbon' },

@@ -2,8 +2,12 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useAdmin } from '@/src/lib/context/AdminContext';
+import { useAuthUser } from '@/src/lib/firebase/auth';
+import { useUserProfile } from '@/src/lib/firebase/users';
+import { signOutUser } from '@/src/lib/firebase/auth';
+import { can, type Action, NAV_PERMISSIONS } from '@/src/lib/rbac';
 import { BunnyMascot } from '../ui/BunnyMascot';
 import {
   LayoutDashboard, ShoppingBag, ShoppingCart, Layers, Boxes, Users,
@@ -11,7 +15,7 @@ import {
   Undo2, Megaphone, Sparkles, Image as ImageIcon, Star, HeartHandshake,
   Mail, LayoutTemplate, Film, FileText, Menu as MenuIcon, BarChart3,
   FileSpreadsheet, Landmark, ShieldCheck, ShieldAlert, History, Bell,
-  Settings, ChevronLeft, ChevronRight, X, LogOut, ExternalLink, Globe, Palette, Sliders
+  Settings, ChevronLeft, ChevronRight, X, LogOut
 } from 'lucide-react';
 
 interface NavItem {
@@ -19,6 +23,7 @@ interface NavItem {
   href: string;
   icon: React.ComponentType<{ className?: string }>;
   badge?: string | number;
+  action?: Action;
 }
 
 interface NavGroup {
@@ -28,6 +33,7 @@ interface NavGroup {
 
 export function AdminSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const {
     isSidebarCollapsed,
     toggleSidebar,
@@ -35,92 +41,142 @@ export function AdminSidebar() {
     setIsMobileSidebarOpen,
     orders,
     notifications,
-    products
+    products,
+    addToast,
   } = useAdmin();
+
+  const { user } = useAuthUser();
+  const { profile } = useUserProfile(user?.uid ?? null);
+  const role = profile?.role ?? null;
 
   const unfulfilledOrders = orders.filter(o => o.fulfillmentStatus === 'Unfulfilled' || o.fulfillmentStatus === 'Processing').length;
   const lowStockCount = products.filter(p => p.stock <= p.lowStockThreshold).length;
   const unreadNotifs = notifications.filter(n => !n.read).length;
 
+  const displayName = profile?.name || user?.email?.split('@')[0] || 'Admin';
+  const displayAvatar =
+    profile?.photoURL ||
+    user?.photoURL ||
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=FFD8EA&color=FF4FA3&size=160`;
+
+  const handleSignOut = async () => {
+    try {
+      await signOutUser();
+      setIsMobileSidebarOpen(false);
+      router.push('/admin/login');
+      addToast({
+        type: 'info',
+        title: 'Signed out',
+        description: 'You have been signed out of the admin console.',
+      });
+    } catch (err) {
+      addToast({
+        type: 'error',
+        title: 'Sign-out failed',
+        description: err instanceof Error ? err.message : 'Please try again.',
+      });
+    }
+  };
+
+  // Each nav item is gated by an RBAC action. Items the role can't
+  // perform are *hidden* (not greyed out) so the sidebar stays focused
+  // on what the user can actually do.
   const navGroups: NavGroup[] = [
     {
       label: 'Overview',
       items: [
-        { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
-        { name: 'Live Store Activity', href: '/admin#live-feed', icon: Sparkles }
-      ]
+        { name: 'Dashboard', href: '/admin', icon: LayoutDashboard, action: 'dashboard:read' },
+      ],
     },
     {
       label: 'Website & Storefront',
       items: [
-        { name: 'Overview', href: '/admin/website', icon: Globe },
-        { name: 'Live Visual Editor', href: '/admin/website/editor', icon: Sparkles, badge: 'Editor' },
-        { name: 'Homepage Sections', href: '/admin/website/homepage', icon: LayoutTemplate },
-        { name: 'Store Pages', href: '/admin/website/pages', icon: FileText },
-        { name: 'Navigation Menus', href: '/admin/website/navigation', icon: MenuIcon },
-        { name: 'Announcements', href: '/admin/website/announcements', icon: Megaphone },
-        { name: 'Popups & Modals', href: '/admin/website/popups', icon: Gift },
-        { name: 'Brand & Bunnies', href: '/admin/website/brand', icon: Sparkles },
-        { name: 'Theme & Colors', href: '/admin/website/theme', icon: Palette },
-        { name: 'Storefront Footer', href: '/admin/website/footer', icon: LayoutTemplate },
-        { name: 'SEO & Metadata', href: '/admin/website/seo', icon: Globe },
-        { name: 'Media Library', href: '/admin/website/media', icon: Film },
-        { name: 'Publish History', href: '/admin/website/history', icon: History }
-      ]
+        { name: 'Overview', href: '/admin/website', icon: Sparkles, action: 'cms:read' },
+        { name: 'Live Visual Editor', href: '/admin/website/editor', icon: Sparkles, action: 'cms:publish', badge: 'Editor' },
+        { name: 'Announcement Bar', href: '/admin/website/announcements', icon: Bell, action: 'cms:publish' },
+        { name: 'Promotional Popup', href: '/admin/website/popups', icon: Megaphone, action: 'cms:publish' },
+      ],
     },
     {
       label: 'Commerce',
       items: [
-        { name: 'Orders', href: '/admin/orders', icon: ShoppingCart, badge: unfulfilledOrders > 0 ? unfulfilledOrders : undefined },
-        { name: 'Products', href: '/admin/products', icon: ShoppingBag },
-        { name: 'Collections', href: '/admin/collections', icon: Layers },
-        { name: 'Inventory', href: '/admin/inventory', icon: Boxes, badge: lowStockCount > 0 ? lowStockCount : undefined },
-        { name: 'Customers', href: '/admin/customers', icon: Users },
-        { name: 'Discounts', href: '/admin/discounts', icon: Tag },
-        { name: 'Gift Cards', href: '/admin/gift-cards', icon: Gift }
-      ]
+        { name: 'Orders', href: '/admin/orders', icon: ShoppingCart, badge: unfulfilledOrders > 0 ? unfulfilledOrders : undefined, action: 'orders:read' },
+        { name: 'Products', href: '/admin/products', icon: ShoppingBag, action: 'products:read' },
+        { name: 'Collections', href: '/admin/collections', icon: Layers, action: 'collections:read' },
+        { name: 'Inventory', href: '/admin/inventory', icon: Boxes, badge: lowStockCount > 0 ? lowStockCount : undefined, action: 'products:read' },
+        { name: 'Customers', href: '/admin/customers', icon: Users, action: 'customers:read' },
+        { name: 'Discounts', href: '/admin/discounts', icon: Tag, action: 'discounts:read' },
+        { name: 'Gift Cards', href: '/admin/gift-cards', icon: Gift, action: 'discounts:read' },
+      ],
     },
     {
       label: 'Operations',
       items: [
-        { name: 'Payments', href: '/admin/payments', icon: CreditCard },
-        { name: 'Transactions', href: '/admin/transactions', icon: ArrowLeftRight },
-        { name: 'Refunds', href: '/admin/refunds', icon: RotateCcw },
-        { name: 'Shipping', href: '/admin/shipping', icon: Truck },
-        { name: 'Delivery Dispatch', href: '/admin/delivery', icon: MapPin },
-        { name: 'Returns', href: '/admin/returns', icon: Undo2 }
-      ]
+        { name: 'Payments', href: '/admin/payments', icon: CreditCard, action: 'finance:read' },
+        { name: 'Transactions', href: '/admin/transactions', icon: ArrowLeftRight, action: 'finance:read' },
+        { name: 'Refunds', href: '/admin/refunds', icon: RotateCcw, action: 'orders:write' },
+        { name: 'Shipping', href: '/admin/shipping', icon: Truck, action: 'shipping:write' },
+        { name: 'Delivery Dispatch', href: '/admin/delivery', icon: MapPin, action: 'orders:read' },
+        { name: 'Returns', href: '/admin/returns', icon: Undo2, action: 'orders:write' },
+      ],
     },
     {
       label: 'Marketing & Community',
       items: [
-        { name: 'Campaigns', href: '/admin/campaigns', icon: Megaphone },
-        { name: 'Promotions', href: '/admin/promotions', icon: Sparkles },
-        { name: 'Store Banners', href: '/admin/banners', icon: ImageIcon },
-        { name: 'Customer Reviews', href: '/admin/reviews', icon: Star },
-        { name: 'Neria Girls (UGC)', href: '/admin/community', icon: HeartHandshake },
-        { name: 'Newsletter Club', href: '/admin/newsletter', icon: Mail }
-      ]
+        { name: 'Campaigns', href: '/admin/campaigns', icon: Megaphone, action: 'campaigns:write' },
+        { name: 'Promotions', href: '/admin/promotions', icon: Sparkles, action: 'campaigns:write' },
+        { name: 'Store Banners', href: '/admin/banners', icon: ImageIcon, action: 'cms:publish' },
+        { name: 'Customer Reviews', href: '/admin/reviews', icon: Star, action: 'reviews:moderate' },
+        { name: 'Neria Girls (UGC)', href: '/admin/community', icon: HeartHandshake, action: 'reviews:moderate' },
+        { name: 'Newsletter Club', href: '/admin/newsletter', icon: Mail, action: 'newsletter:write' },
+      ],
     },
     {
       label: 'Business Intelligence',
       items: [
-        { name: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
-        { name: 'Reports & Exports', href: '/admin/reports', icon: FileSpreadsheet },
-        { name: 'Finance & P&L', href: '/admin/finance', icon: Landmark }
-      ]
+        { name: 'Analytics', href: '/admin/analytics', icon: BarChart3, action: 'analytics:read' },
+        { name: 'Reports & Exports', href: '/admin/reports', icon: FileSpreadsheet, action: 'reports:read' },
+        { name: 'Finance & P&L', href: '/admin/finance', icon: Landmark, action: 'finance:read' },
+      ],
     },
     {
       label: 'Administration',
       items: [
-        { name: 'Staff Management', href: '/admin/staff', icon: ShieldCheck },
-        { name: 'Roles & Permissions', href: '/admin/roles', icon: ShieldAlert },
-        { name: 'Activity Audit Logs', href: '/admin/activity', icon: History },
-        { name: 'Notifications', href: '/admin/notifications', icon: Bell, badge: unreadNotifs > 0 ? unreadNotifs : undefined },
-        { name: 'Store Settings', href: '/admin/settings', icon: Settings }
-      ]
-    }
+        { name: 'Staff Management', href: '/admin/staff', icon: ShieldCheck, action: 'staff:read' },
+        { name: 'Roles & Permissions', href: '/admin/roles', icon: ShieldAlert, action: 'roles:write' },
+        { name: 'Activity Audit Logs', href: '/admin/activity', icon: History, action: 'activity:read' },
+        { name: 'Notifications', href: '/admin/notifications', icon: Bell, badge: unreadNotifs > 0 ? unreadNotifs : undefined, action: 'dashboard:read' },
+        { name: 'Store Settings', href: '/admin/settings', icon: Settings, action: 'settings:write' },
+      ],
+    },
   ];
+
+  // Filter each group: drop items the current role can't access. If
+  // *every* item in a group is hidden, drop the group entirely so the
+  // sidebar doesn't render an empty section header.
+  const visibleGroups = navGroups
+    .map((g) => ({
+      ...g,
+      items: g.items.filter(
+        (i) => !i.action || can(role, i.action),
+      ),
+    }))
+    .filter((g) => g.items.length > 0);
+
+  // Belt-and-braces: if a user navigates directly to a page they
+  // can't access, send them back to the dashboard.
+  React.useEffect(() => {
+    if (!role) return;
+    const required = NAV_PERMISSIONS[pathname];
+    if (required && !can(role, required)) {
+      addToast({
+        type: 'warning',
+        title: "You don't have access to that page",
+        description: 'Your role does not include this section.',
+      });
+      router.replace('/admin');
+    }
+  }, [pathname, role, router, addToast]);
 
   const sidebarContent = (
     <div className="flex flex-col h-full bg-white select-none">
@@ -142,7 +198,6 @@ export function AdminSidebar() {
           )}
         </Link>
 
-        {/* Desktop Collapse Toggle in header */}
         {!isSidebarCollapsed && (
           <button
             onClick={toggleSidebar}
@@ -156,7 +211,7 @@ export function AdminSidebar() {
 
       {/* Navigation Scrollable Area */}
       <div className="flex-1 overflow-y-auto px-3 py-4 space-y-6">
-        {navGroups.map((group, gIdx) => (
+        {visibleGroups.map((group, gIdx) => (
           <div key={gIdx}>
             {!isSidebarCollapsed && (
               <h4 className="px-3 mb-1.5 text-[11px] font-bold tracking-wider text-[#98A0AE] uppercase">
@@ -179,7 +234,6 @@ export function AdminSidebar() {
                           : 'text-[#475467] hover:bg-[#FFF4F8]/60 hover:text-[#263550]'
                       } ${isSidebarCollapsed ? 'justify-center px-2' : ''}`}
                     >
-                      {/* Active Left Indicator Bar */}
                       {isActive && (
                         <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-[#FF4FA3] rounded-r-full" />
                       )}
@@ -201,7 +255,6 @@ export function AdminSidebar() {
                       )}
                     </Link>
 
-                    {/* Tooltip for collapsed mode */}
                     {isSidebarCollapsed && (
                       <div className="fixed left-20 ml-2 hidden group-hover/nav:flex items-center px-2.5 py-1.5 bg-[#263550] text-white text-xs font-medium rounded-lg shadow-xl z-50 whitespace-nowrap animate-in fade-in">
                         {item.name}
@@ -233,8 +286,8 @@ export function AdminSidebar() {
             </button>
             <div className="w-8 h-8 rounded-full ring-2 ring-[#FFD8EA] overflow-hidden">
               <img
-                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&q=80"
-                alt="Admin"
+                src={displayAvatar}
+                alt={displayName}
                 className="w-full h-full object-cover"
               />
             </div>
@@ -244,23 +297,25 @@ export function AdminSidebar() {
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="w-9 h-9 rounded-full ring-2 ring-[#FFD8EA] overflow-hidden shrink-0">
                 <img
-                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&q=80"
-                  alt="Admin"
+                  src={displayAvatar}
+                  alt={displayName}
                   className="w-full h-full object-cover"
                 />
               </div>
               <div className="min-w-0">
-                <h5 className="text-xs font-bold text-[#263550] truncate">Neria Founder</h5>
-                <p className="text-[10px] text-[#98A0AE] font-medium truncate">Super Admin</p>
+                <h5 className="text-xs font-bold text-[#263550] truncate">{displayName}</h5>
+                <p className="text-[10px] text-[#98A0AE] font-medium truncate">
+                  {role ? role.replace('_', ' ') : 'staff'}
+                </p>
               </div>
             </div>
-            <Link
-              href="/admin/login"
+            <button
+              onClick={handleSignOut}
               title="Sign Out"
-              className="p-1.5 rounded-lg text-[#98A0AE] hover:text-[#FF4FA3] hover:bg-[#FFF4F8] transition-colors"
+              className="p-1.5 rounded-lg text-[#98A0AE] hover:text-[#FF4FA3] hover:bg-[#FFF4F8] transition-colors cursor-pointer"
             >
               <LogOut className="w-4 h-4" />
-            </Link>
+            </button>
           </div>
         )}
       </div>
@@ -281,13 +336,11 @@ export function AdminSidebar() {
       {/* Mobile Drawer Navigation */}
       {isMobileSidebarOpen && (
         <div className="lg:hidden fixed inset-0 z-50 flex">
-          {/* Backdrop */}
           <div
             onClick={() => setIsMobileSidebarOpen(false)}
             className="fixed inset-0 bg-[#101828]/50 backdrop-blur-sm animate-in fade-in"
           />
 
-          {/* Drawer content */}
           <div className="relative w-72 max-w-[80vw] bg-white h-full shadow-2xl z-10 flex flex-col animate-in slide-in-from-left duration-300">
             <button
               onClick={() => setIsMobileSidebarOpen(false)}

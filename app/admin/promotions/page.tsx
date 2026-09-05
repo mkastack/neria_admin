@@ -7,10 +7,10 @@ import { StatusBadge } from '@/src/components/ui/StatusBadge';
 export default function PromotionsPage() {
   const promos = [
     {
-      title: 'Free Shipping on Accra Orders over GH₵ 500',
+      title: 'Free Shipping on US Orders over $500',
       type: 'Shipping Promo',
       status: 'Active',
-      impact: 'GH₵ 12,400 sales',
+      impact: '$ 12,400 sales',
       date: 'Active all month'
     },
     {

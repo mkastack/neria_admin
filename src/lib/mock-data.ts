@@ -176,9 +176,9 @@ export const mockOrders: Order[] = [
     orderNumber: 'NER-2048',
     customer: {
       id: 'cust-1',
-      name: 'Ama Serwaa Darko',
-      email: 'ama.darko@gmail.com',
-      phone: '+233 24 559 8812',
+      name: 'Avery Sinclair',
+      email: 'avery.sinclair@gmail.com',
+      phone: '+1 (212) 555-0182',
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80'
     },
     createdAt: '2026-08-28T01:45:00Z',
@@ -212,13 +212,13 @@ export const mockOrders: Order[] = [
     ],
     paymentStatus: 'Paid',
     fulfillmentStatus: 'Processing',
-    paymentMethod: 'MTN Mobile Money',
+    paymentMethod: 'Stripe (Apple Pay)',
     deliveryMethod: 'Express Delivery',
     deliveryAddress: {
-      street: '14 Independence Avenue, Airport Residential Area',
-      city: 'Accra',
-      region: 'Greater Accra',
-      country: 'Ghana'
+      street: '226 W 26th St, Apt 4B',
+      city: 'New York',
+      region: 'NY',
+      country: 'United States'
     },
     subtotal: 580,
     discount: 58,
@@ -231,9 +231,9 @@ export const mockOrders: Order[] = [
     tags: ['VIP Customer', 'Express'],
     timeline: [
       { id: 't-1', title: 'Order Placed', time: '01:45 AM', date: 'Aug 28, 2026', description: 'Customer placed order via website checkout.', completed: true },
-      { id: 't-2', title: 'Payment Confirmed', time: '01:46 AM', date: 'Aug 28, 2026', description: 'MTN Mobile Money transaction #MOM99238 confirmed.', completed: true },
+      { id: 't-2', title: 'Payment Confirmed', time: '01:46 AM', date: 'Aug 28, 2026', description: 'Stripe PaymentIntent pi_3OH7Kx2eZvKYlo2C0XYZ confirmed.', completed: true },
       { id: 't-3', title: 'Processing at Fulfillment Hub', time: '02:10 AM', date: 'Aug 28, 2026', description: 'Items picked from shelf B4 & packed.', completed: true },
-      { id: 't-4', title: 'Dispatch & Courier Handover', time: 'Pending', date: 'Aug 28, 2026', description: 'Assigned to Express Rider Kweku.', completed: false },
+      { id: 't-4', title: 'Dispatch & Courier Handover', time: 'Pending', date: 'Aug 28, 2026', description: 'Handed off to UPS overnight courier.', completed: false },
       { id: 't-5', title: 'Delivered', time: 'Pending', date: 'Aug 28, 2026', description: 'Customer signature upon delivery.', completed: false }
     ]
   },
@@ -242,9 +242,9 @@ export const mockOrders: Order[] = [
     orderNumber: 'NER-2047',
     customer: {
       id: 'cust-2',
-      name: 'Abena Osei Poku',
-      email: 'abena.osei@outlook.com',
-      phone: '+233 50 112 4490',
+      name: 'Abigail Park',
+      email: 'abigail.park@outlook.com',
+      phone: '+1 (310) 555-0149',
       avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200&q=80'
     },
     createdAt: '2026-08-27T22:15:00Z',
@@ -268,10 +268,10 @@ export const mockOrders: Order[] = [
     paymentMethod: 'Credit / Debit Card',
     deliveryMethod: 'Standard Delivery',
     deliveryAddress: {
-      street: 'Plot 24 Ahodwo Nhyiaeso',
-      city: 'Kumasi',
-      region: 'Ashanti',
-      country: 'Ghana'
+      street: '8421 Sunset Blvd, Apt 12',
+      city: 'Los Angeles',
+      region: 'CA',
+      country: 'United States'
     },
     subtotal: 580,
     discount: 0,
@@ -279,12 +279,12 @@ export const mockOrders: Order[] = [
     tax: 0,
     total: 625,
     fraudRisk: 'Low',
-    tags: ['Intercity Kumasi'],
+    tags: ['West Coast'],
     timeline: [
       { id: 't-6', title: 'Order Placed', time: '10:15 PM', date: 'Aug 27, 2026', completed: true },
       { id: 't-7', title: 'Payment Confirmed', time: '10:16 PM', date: 'Aug 27, 2026', completed: true },
       { id: 't-8', title: 'Packed & Sealed', time: '11:00 PM', date: 'Aug 27, 2026', completed: true },
-      { id: 't-9', title: 'Shipped via VIP Courier', time: '06:30 AM', date: 'Aug 28, 2026', description: 'Tracking #KUM-8849-GH', completed: true },
+      { id: 't-9', title: 'Shipped via UPS Ground', time: '06:30 AM', date: 'Aug 28, 2026', description: 'Tracking #1Z999AA10123456784', completed: true },
       { id: 't-10', title: 'Delivered', time: 'Pending', date: 'Aug 28, 2026', completed: false }
     ]
   },
@@ -293,9 +293,9 @@ export const mockOrders: Order[] = [
     orderNumber: 'NER-2046',
     customer: {
       id: 'cust-3',
-      name: 'Jessica Boateng',
-      email: 'jess.boateng@icloud.com',
-      phone: '+233 20 892 0019',
+      name: 'Jessica Bell',
+      email: 'jess.bell@icloud.com',
+      phone: '+1 (404) 555-0119',
       avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&q=80'
     },
     createdAt: '2026-08-27T19:30:00Z',
@@ -316,13 +316,13 @@ export const mockOrders: Order[] = [
     ],
     paymentStatus: 'Paid',
     fulfillmentStatus: 'Delivered',
-    paymentMethod: 'Telecel Cash',
+    paymentMethod: 'Stripe (Card)',
     deliveryMethod: 'Standard Delivery',
     deliveryAddress: {
-      street: 'Block G, Cantonments City',
-      city: 'Accra',
-      region: 'Greater Accra',
-      country: 'Ghana'
+      street: '1100 Peachtree St NE',
+      city: 'Atlanta',
+      region: 'GA',
+      country: 'United States'
     },
     subtotal: 680,
     discount: 50,
@@ -344,9 +344,9 @@ export const mockOrders: Order[] = [
     orderNumber: 'NER-2045',
     customer: {
       id: 'cust-4',
-      name: 'Esi Mansa Mills',
-      email: 'esi.mills@gmail.com',
-      phone: '+233 26 339 1277',
+      name: 'Emily Marsh',
+      email: 'emily.marsh@gmail.com',
+      phone: '+1 (312) 555-0177',
       avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&q=80'
     },
     createdAt: '2026-08-27T16:00:00Z',
@@ -367,13 +367,13 @@ export const mockOrders: Order[] = [
     ],
     paymentStatus: 'Pending',
     fulfillmentStatus: 'Unfulfilled',
-    paymentMethod: 'Bank Transfer',
+    paymentMethod: 'PayPal',
     deliveryMethod: 'Standard Delivery',
     deliveryAddress: {
-      street: 'Spintex Road, Behind Palace Mall',
-      city: 'Accra',
-      region: 'Greater Accra',
-      country: 'Ghana'
+      street: '400 N Michigan Ave, Apt 2201',
+      city: 'Chicago',
+      region: 'IL',
+      country: 'United States'
     },
     subtotal: 480,
     discount: 0,
@@ -381,10 +381,10 @@ export const mockOrders: Order[] = [
     tax: 0,
     total: 505,
     fraudRisk: 'Medium',
-    tags: ['Awaiting Bank Slip'],
+    tags: ['Awaiting PayPal Capture'],
     timeline: [
       { id: 't-15', title: 'Order Placed', time: '04:00 PM', date: 'Aug 27, 2026', completed: true },
-      { id: 't-16', title: 'Payment Verification Pending', time: '04:05 PM', date: 'Aug 27, 2026', description: 'Awaiting customer proof of transfer.', completed: false }
+      { id: 't-16', title: 'Payment Verification Pending', time: '04:05 PM', date: 'Aug 27, 2026', description: 'Awaiting PayPal authorization capture.', completed: false }
     ]
   },
   {
@@ -392,9 +392,9 @@ export const mockOrders: Order[] = [
     orderNumber: 'NER-2044',
     customer: {
       id: 'cust-5',
-      name: 'Kafui Adjoa Segbefia',
-      email: 'kafui.adjoa@yahoo.com',
-      phone: '+233 24 771 9022',
+      name: 'Kayla Addison',
+      email: 'kayla.addison@yahoo.com',
+      phone: '+1 (206) 555-0122',
       avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200&q=80'
     },
     createdAt: '2026-08-27T12:10:00Z',
@@ -415,13 +415,13 @@ export const mockOrders: Order[] = [
     ],
     paymentStatus: 'Refunded',
     fulfillmentStatus: 'Returned',
-    paymentMethod: 'MTN Mobile Money',
+    paymentMethod: 'Stripe (Card)',
     deliveryMethod: 'Standard Delivery',
     deliveryAddress: {
-      street: 'Adjiringanor Rd, East Legon',
-      city: 'Accra',
-      region: 'Greater Accra',
-      country: 'Ghana'
+      street: '1424 11th Ave, Apt 305',
+      city: 'Seattle',
+      region: 'WA',
+      country: 'United States'
     },
     subtotal: 420,
     discount: 0,
@@ -435,7 +435,7 @@ export const mockOrders: Order[] = [
       { id: 't-17', title: 'Order Placed', time: '12:10 PM', date: 'Aug 27, 2026', completed: true },
       { id: 't-18', title: 'Delivered', time: '02:40 PM', date: 'Aug 27, 2026', completed: true },
       { id: 't-19', title: 'Return Initiated & Received', time: '05:20 PM', date: 'Aug 27, 2026', completed: true },
-      { id: 't-20', title: 'Refund Dispatched GH₵445', time: '06:00 PM', date: 'Aug 27, 2026', completed: true }
+      { id: 't-20', title: 'Refund Dispatched $445', time: '06:00 PM', date: 'Aug 27, 2026', completed: true }
     ]
   }
 ];
@@ -516,17 +516,17 @@ export const mockCollections: Collection[] = [
 export const mockCustomers: Customer[] = [
   {
     id: 'cust-1',
-    name: 'Ama Serwaa Darko',
-    email: 'ama.darko@gmail.com',
-    phone: '+233 24 559 8812',
+    name: 'Avery Sinclair',
+    email: 'avery.sinclair@gmail.com',
+    phone: '+1 (212) 555-0182',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80',
     ordersCount: 8,
     totalSpent: 4320,
     lastOrderDate: '2026-08-28T01:45:00Z',
     segment: 'VIP',
-    address: '14 Independence Ave, Airport Residential Area',
-    city: 'Accra',
-    region: 'Greater Accra',
+    address: '226 W 26th St, Apt 4B',
+    city: 'New York',
+    region: 'NY',
     notes: [
       { id: 'n-1', text: 'VIP client. Prefers size M hoodies. Loves strawberry gift packaging.', author: 'Neria Admin', timestamp: '2026-08-20T10:00:00Z' }
     ],
@@ -536,37 +536,37 @@ export const mockCustomers: Customer[] = [
   },
   {
     id: 'cust-2',
-    name: 'Abena Osei Poku',
-    email: 'abena.osei@outlook.com',
-    phone: '+233 50 112 4490',
+    name: 'Abigail Park',
+    email: 'abigail.park@outlook.com',
+    phone: '+1 (310) 555-0149',
     avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200&q=80',
     ordersCount: 4,
     totalSpent: 2190,
     lastOrderDate: '2026-08-27T22:15:00Z',
     segment: 'Returning',
-    address: 'Plot 24 Ahodwo Nhyiaeso',
-    city: 'Kumasi',
-    region: 'Ashanti',
+    address: '8421 Sunset Blvd, Apt 12',
+    city: 'Los Angeles',
+    region: 'CA',
     notes: [
-      { id: 'n-2', text: 'Requests VIP intercity express delivery for dresses.', author: 'Kofi Staff', timestamp: '2026-07-15T14:30:00Z' }
+      { id: 'n-2', text: 'Requests express overnight for dresses.', author: 'Kofi Staff', timestamp: '2026-07-15T14:30:00Z' }
     ],
-    tags: ['Kumasi', 'Dress Lover'],
+    tags: ['West Coast', 'Dress Lover'],
     joinedDate: '2026-04-10T11:20:00Z',
     wishlistCount: 3
   },
   {
     id: 'cust-3',
-    name: 'Jessica Boateng',
-    email: 'jess.boateng@icloud.com',
-    phone: '+233 20 892 0019',
+    name: 'Jessica Bell',
+    email: 'jess.bell@icloud.com',
+    phone: '+1 (404) 555-0119',
     avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&q=80',
     ordersCount: 1,
     totalSpent: 655,
     lastOrderDate: '2026-08-27T19:30:00Z',
     segment: 'New',
-    address: 'Block G, Cantonments City',
-    city: 'Accra',
-    region: 'Greater Accra',
+    address: '1100 Peachtree St NE',
+    city: 'Atlanta',
+    region: 'GA',
     notes: [],
     tags: ['First Time Buyer'],
     joinedDate: '2026-08-27T19:00:00Z',
@@ -574,17 +574,17 @@ export const mockCustomers: Customer[] = [
   },
   {
     id: 'cust-4',
-    name: 'Esi Mansa Mills',
-    email: 'esi.mills@gmail.com',
-    phone: '+233 26 339 1277',
+    name: 'Emily Marsh',
+    email: 'emily.marsh@gmail.com',
+    phone: '+1 (312) 555-0177',
     avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&q=80',
     ordersCount: 2,
     totalSpent: 890,
     lastOrderDate: '2026-08-27T16:00:00Z',
     segment: 'Returning',
-    address: 'Spintex Road, Behind Palace Mall',
-    city: 'Accra',
-    region: 'Greater Accra',
+    address: '400 N Michigan Ave, Apt 2201',
+    city: 'Chicago',
+    region: 'IL',
     notes: [],
     tags: ['Accessories'],
     joinedDate: '2026-06-01T09:15:00Z',
@@ -634,8 +634,8 @@ export const mockGiftCards: GiftCard[] = [
   {
     id: 'gc-1',
     code: 'NER-GIFT-9920-BLSH',
-    customerName: 'Ama Serwaa Darko',
-    customerEmail: 'ama.darko@gmail.com',
+    customerName: 'Avery Sinclair',
+    customerEmail: 'avery.sinclair@gmail.com',
     initialValue: 500,
     balance: 240,
     status: 'Active',
@@ -645,8 +645,8 @@ export const mockGiftCards: GiftCard[] = [
   {
     id: 'gc-2',
     code: 'NER-GIFT-4412-PINK',
-    customerName: 'Kafui Adjoa Segbefia',
-    customerEmail: 'kafui.adjoa@yahoo.com',
+    customerName: 'Kayla Addison',
+    customerEmail: 'kayla.addison@yahoo.com',
     initialValue: 350,
     balance: 0,
     status: 'Redeemed',
@@ -660,42 +660,42 @@ export const mockTransactions: Transaction[] = [
     id: 'tx-1',
     transactionNumber: 'TX-99824',
     orderNumber: 'NER-2048',
-    customerName: 'Ama Serwaa Darko',
-    method: 'MTN Mobile Money',
+    customerName: 'Avery Sinclair',
+    method: 'Stripe (Apple Pay)',
     type: 'Charge',
     amount: 557,
     fee: 5.57,
     net: 551.43,
     status: 'Success',
-    reference: 'MOM-GH-881920',
+    reference: 'pi_3OH7Kx2eZvKYlo2C0XYZ',
     date: '2026-08-28T01:46:00Z'
   },
   {
     id: 'tx-2',
     transactionNumber: 'TX-99823',
     orderNumber: 'NER-2047',
-    customerName: 'Abena Osei Poku',
-    method: 'Credit / Debit Card',
+    customerName: 'Abigail Park',
+    method: 'Stripe (Card)',
     type: 'Charge',
     amount: 625,
     fee: 12.50,
     net: 612.50,
     status: 'Success',
-    reference: 'CRD-VISA-00912',
+    reference: 'pi_3OH6Rt2eZvKYlo2C0ABC',
     date: '2026-08-27T22:16:00Z'
   },
   {
     id: 'tx-3',
     transactionNumber: 'TX-99822',
     orderNumber: 'NER-2044',
-    customerName: 'Kafui Adjoa Segbefia',
-    method: 'MTN Mobile Money',
+    customerName: 'Kayla Addison',
+    method: 'Stripe (Card)',
     type: 'Refund',
     amount: 445,
     fee: 0,
     net: -445,
     status: 'Success',
-    reference: 'REF-MOM-11029',
+    reference: 're_3OH5Yk2eZvKYlo2C0DEF',
     date: '2026-08-27T18:00:00Z'
   }
 ];
@@ -705,7 +705,7 @@ export const mockRefunds: Refund[] = [
     id: 'ref-1',
     refundNumber: 'REF-201',
     orderNumber: 'NER-2044',
-    customerName: 'Kafui Adjoa Segbefia',
+    customerName: 'Kayla Addison',
     reason: 'Wrong Size',
     amount: 445,
     status: 'Completed',
@@ -718,8 +718,8 @@ export const mockRefunds: Refund[] = [
 export const mockShippingZones: ShippingZone[] = [
   {
     id: 'zone-1',
-    name: 'Greater Accra Central',
-    regions: ['Airport Residential', 'East Legon', 'Cantonments', 'Osu', 'Labone', 'Dzorwulu'],
+    name: 'Northeast US',
+    regions: ['New York', 'New Jersey', 'Massachusetts', 'Pennsylvania', 'Connecticut', 'Washington DC'],
     standardRate: 25,
     expressRate: 40,
     estimatedDelivery: 'Same Day - 24 Hours',
@@ -727,8 +727,8 @@ export const mockShippingZones: ShippingZone[] = [
   },
   {
     id: 'zone-2',
-    name: 'Greater Accra Outer',
-    regions: ['Tema', 'Spintex', 'Madina', 'Kasoa', 'Pokuase', 'Adenta'],
+    name: 'Southeast US',
+    regions: ['Florida', 'Georgia', 'North Carolina', 'South Carolina', 'Virginia', 'Tennessee'],
     standardRate: 35,
     expressRate: 50,
     estimatedDelivery: '24 - 48 Hours',
@@ -736,8 +736,8 @@ export const mockShippingZones: ShippingZone[] = [
   },
   {
     id: 'zone-3',
-    name: 'Ashanti Region (Kumasi)',
-    regions: ['Kumasi Central', 'Ahodwo', 'Nhyiaeso', 'Asokwa', 'KNUST'],
+    name: 'West Coast US',
+    regions: ['California', 'Washington', 'Oregon', 'Nevada', 'Arizona'],
     standardRate: 45,
     expressRate: 70,
     estimatedDelivery: '1 - 2 Business Days',
@@ -745,8 +745,8 @@ export const mockShippingZones: ShippingZone[] = [
   },
   {
     id: 'zone-4',
-    name: 'Other Regional Capitals',
-    regions: ['Takoradi', 'Cape Coast', 'Sunyani', 'Tamale', 'Ho', 'Koforidua'],
+    name: 'Midwest & Mountain',
+    regions: ['Illinois', 'Texas', 'Colorado', 'Utah', 'Michigan', 'Minnesota'],
     standardRate: 55,
     expressRate: 90,
     estimatedDelivery: '2 - 4 Business Days',
@@ -759,10 +759,10 @@ export const mockDeliveryRiders: DeliveryRide[] = [
     id: 'del-1',
     trackingNumber: 'RIDE-8812',
     orderNumber: 'NER-2048',
-    customerName: 'Ama Serwaa Darko',
-    address: '14 Independence Ave, Airport Residential',
-    riderName: 'Kweku Mensah',
-    riderPhone: '+233 54 880 1192',
+    customerName: 'Avery Sinclair',
+    address: '226 W 26th St, New York',
+    riderName: 'Marcus Reeves',
+    riderPhone: '+1 (212) 555-0210',
     status: 'In Transit',
     estimatedDelivery: '03:15 AM',
     coordinates: { x: 48, y: 35 }
@@ -771,10 +771,10 @@ export const mockDeliveryRiders: DeliveryRide[] = [
     id: 'del-2',
     trackingNumber: 'RIDE-8810',
     orderNumber: 'NER-2046',
-    customerName: 'Jessica Boateng',
-    address: 'Block G, Cantonments City',
-    riderName: 'Kwame Asante',
-    riderPhone: '+233 24 990 4421',
+    customerName: 'Jessica Bell',
+    address: '1100 Peachtree St NE, Atlanta',
+    riderName: 'Devon Carter',
+    riderPhone: '+1 (404) 555-0192',
     status: 'Delivered',
     estimatedDelivery: '09:20 PM',
     coordinates: { x: 62, y: 55 }
@@ -786,8 +786,8 @@ export const mockReturnRequests: ReturnRequest[] = [
     id: 'ret-1',
     returnNumber: 'RET-109',
     orderNumber: 'NER-2044',
-    customerName: 'Kafui Adjoa Segbefia',
-    customerEmail: 'kafui.adjoa@yahoo.com',
+    customerName: 'Kayla Addison',
+    customerEmail: 'kayla.addison@yahoo.com',
     items: ['Pink Bunny Oversized Hoodie - S'],
     reason: 'Needs size exchange to Medium',
     status: 'Refunded',
@@ -835,11 +835,11 @@ export const mockReviews: Review[] = [
     id: 'rev-1',
     productName: 'Pink Bunny Oversized Hoodie',
     productImage: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=200&q=80',
-    customerName: 'Ama S.',
+    customerName: 'Avery S.',
     customerAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80',
     rating: 5,
     title: 'The softest hoodie I own! ♡',
-    content: 'Literally never taking this off. The bunny ears are so adorable and the fleece is super thick and cozy. Worth every cedi!',
+    content: 'Literally never taking this off. The bunny ears are so adorable and the fleece is super thick and cozy. Worth every dollar!',
     date: '2026-08-25',
     status: 'Approved',
     featured: true,
@@ -849,7 +849,7 @@ export const mockReviews: Review[] = [
     id: 'rev-2',
     productName: 'Strawberry Sweetheart Tiered Dress',
     productImage: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=200&q=80',
-    customerName: 'Abena P.',
+    customerName: 'Abigail P.',
     customerAvatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200&q=80',
     rating: 5,
     title: 'Pure fairytale vibes ✨',
@@ -863,7 +863,7 @@ export const mockReviews: Review[] = [
 export const mockCommunityPosts: CommunityPost[] = [
   {
     id: 'post-1',
-    username: '@ama.serwaa',
+    username: '@avery.sinclair',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80',
     image: 'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=600&q=80',
     caption: 'Sunday brunch styled in @neriacollective strawberry sweetheart dress 🍓✨',
@@ -874,7 +874,7 @@ export const mockCommunityPosts: CommunityPost[] = [
   },
   {
     id: 'post-2',
-    username: '@jessicab_gh',
+    username: '@jessicab_ny',
     avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&q=80',
     image: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=600&q=80',
     caption: 'Living in this pink bunny hoodie forever 🐰💕',
@@ -888,8 +888,8 @@ export const mockCommunityPosts: CommunityPost[] = [
 export const mockNewsletterSubscribers: NewsletterSubscriber[] = [
   {
     id: 'sub-1',
-    email: 'ama.darko@gmail.com',
-    name: 'Ama Serwaa',
+    email: 'avery.sinclair@gmail.com',
+    name: 'Avery Sinclair',
     joinedDate: '2026-02-14',
     source: 'Footer Signup',
     status: 'VIP',
@@ -898,8 +898,8 @@ export const mockNewsletterSubscribers: NewsletterSubscriber[] = [
   },
   {
     id: 'sub-2',
-    email: 'abena.osei@outlook.com',
-    name: 'Abena Osei',
+    email: 'abigail.park@outlook.com',
+    name: 'Abigail Park',
     joinedDate: '2026-04-10',
     source: 'Checkout',
     status: 'Active',
@@ -908,8 +908,8 @@ export const mockNewsletterSubscribers: NewsletterSubscriber[] = [
   },
   {
     id: 'sub-3',
-    email: 'jess.boateng@icloud.com',
-    name: 'Jessica Boateng',
+    email: 'jess.bell@icloud.com',
+    name: 'Jessica Bell',
     joinedDate: '2026-08-27',
     source: 'Popup Modal',
     status: 'Active',
@@ -941,8 +941,8 @@ export const mockStaff: StaffMember[] = [
   },
   {
     id: 'st-3',
-    name: 'Kwame Boateng',
-    email: 'kwame.b@neriacollective.com',
+    name: 'Devon Carter',
+    email: 'devon.c@neriacollective.com',
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80',
     role: 'Inventory Manager',
     lastActive: '1 hour ago',
@@ -959,7 +959,7 @@ export const mockActivityLogs: ActivityLog[] = [
     action: 'Fulfilled',
     resource: 'Order',
     description: 'Updated order #NER-2048 to Processing & dispatched to courier.',
-    ipAddress: '197.251.134.12',
+    ipAddress: '24.104.18.42',
     timestamp: '10 mins ago'
   },
   {
@@ -969,17 +969,17 @@ export const mockActivityLogs: ActivityLog[] = [
     action: 'Created',
     resource: 'Discount',
     description: 'Created promotional discount code #NERIA10 for 10% off.',
-    ipAddress: '197.251.134.88',
+    ipAddress: '24.104.18.91',
     timestamp: '45 mins ago'
   },
   {
     id: 'act-3',
-    staffName: 'Kwame Boateng',
+    staffName: 'Devon Carter',
     staffAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80',
     action: 'Updated',
     resource: 'Inventory',
     description: 'Adjusted stock for Pink Bunny Oversized Hoodie (+20 units).',
-    ipAddress: '197.251.140.02',
+    ipAddress: '24.104.18.7',
     timestamp: '2 hours ago'
   }
 ];
@@ -989,7 +989,7 @@ export const mockNotifications: NotificationItem[] = [
     id: 'notif-1',
     category: 'Orders',
     title: 'New Order #NER-2048',
-    description: 'Ama Serwaa Darko paid GH₵ 557 via MTN Mobile Money.',
+    description: 'Avery Sinclair paid $557 via Apple Pay.',
     timestamp: '5 mins ago',
     read: false,
     actionUrl: '/admin/orders/ord-1'
@@ -1007,7 +1007,7 @@ export const mockNotifications: NotificationItem[] = [
     id: 'notif-3',
     category: 'Reviews',
     title: 'New 5-Star Review',
-    description: 'Ama S. left a review on Pink Bunny Oversized Hoodie.',
+    description: 'Avery S. left a review on Pink Bunny Oversized Hoodie.',
     timestamp: '2 hours ago',
     read: true,
     actionUrl: '/admin/reviews'
@@ -1016,7 +1016,7 @@ export const mockNotifications: NotificationItem[] = [
     id: 'notif-4',
     category: 'Payments',
     title: 'Daily Payout Settlement',
-    description: 'GH₵ 18,450 MTN MoMo merchant payout processed to Stanbic Bank.',
+    description: '$18,450 Stripe payout processed to Chase Business Checking.',
     timestamp: '4 hours ago',
     read: true,
     actionUrl: '/admin/payments'
@@ -1042,9 +1042,9 @@ export const mockSalesByCategory = [
 ];
 
 export const mockLiveFeed = [
-  { id: 'lf-1', text: 'Someone from East Legon, Accra added Pink Bunny Hoodie to cart', time: 'Just now', icon: 'cart' },
-  { id: 'lf-2', text: 'Order #NER-2048 confirmed (GH₵ 557)', time: '2m ago', icon: 'order' },
+  { id: 'lf-1', text: 'Someone from Brooklyn, NY added Pink Bunny Hoodie to cart', time: 'Just now', icon: 'cart' },
+  { id: 'lf-2', text: 'Order #NER-2048 confirmed ($557)', time: '2m ago', icon: 'order' },
   { id: 'lf-3', text: 'Jessica B. added Strawberry Sweetheart Dress to wishlist', time: '8m ago', icon: 'wishlist' },
   { id: 'lf-4', text: 'Soft Girl Cardigan (Powder Blue) marked Low Stock (2 left)', time: '18m ago', icon: 'stock' },
-  { id: 'lf-5', text: 'Order #NER-2046 delivered in Cantonments', time: '30m ago', icon: 'delivery' }
+  { id: 'lf-5', text: 'Order #NER-2046 delivered in Atlanta, GA', time: '30m ago', icon: 'delivery' }
 ];

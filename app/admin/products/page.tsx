@@ -10,9 +10,10 @@ import {
   Edit, Trash2, Tag, Layers, CheckCircle2, Boxes
 } from 'lucide-react';
 import { Product } from '@/src/lib/types';
+import { deleteProduct } from '@/src/lib/firebase/products';
 
 export default function ProductsPage() {
-  const { products, setProducts, addToast } = useAdmin();
+  const { products, addToast } = useAdmin();
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
   const [activeTab, setActiveTab] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -35,13 +36,22 @@ export default function ProductsPage() {
     return true;
   });
 
-  const handleDelete = (id: string, name: string) => {
-    setProducts(prev => prev.filter(p => p.id !== id));
-    addToast({
-      type: 'info',
-      title: 'Product Deleted',
-      description: `${name} has been removed from inventory.`
-    });
+  const handleDelete = async (id: string, name: string) => {
+    if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
+    try {
+      await deleteProduct(id);
+      addToast({
+        type: 'info',
+        title: 'Product Deleted',
+        description: `${name} has been removed from inventory.`,
+      });
+    } catch (err) {
+      addToast({
+        type: 'error',
+        title: 'Delete failed',
+        description: err instanceof Error ? err.message : 'Please try again.',
+      });
+    }
   };
 
   const handleExport = () => {
@@ -223,7 +233,7 @@ export default function ProductsPage() {
                       </span>
                     </td>
                     <td className="py-3.5 px-3 font-bold text-[#263550]">
-                      GH₵ {product.price}
+                      $ {product.price}
                     </td>
                     <td className="py-3.5 px-3 text-[#667085]">
                       {product.salesCount} sold
@@ -279,7 +289,7 @@ export default function ProductsPage() {
                   {product.name}
                 </h4>
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-base font-extrabold text-[#263550]">GH₵ {product.price}</span>
+                  <span className="text-base font-extrabold text-[#263550]">$ {product.price}</span>
                   <span className={`font-semibold text-xs ${product.stock <= product.lowStockThreshold ? 'text-[#B54708]' : 'text-[#027A48]'}`}>
                     {product.stock} in stock
                   </span>

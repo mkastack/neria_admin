@@ -1,13 +1,16 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useStorefrontCms } from '@/src/lib/context/StorefrontCmsContext';
 import { BunnyMascot } from '../ui/BunnyMascot';
 import {
   Monitor, Tablet, Smartphone, Undo2, Redo2, Eye, Save, Globe,
-  CheckCircle2, Loader2, ArrowLeft, Sparkles, ChevronDown, Layers
+  CheckCircle2, Loader2, ArrowLeft, Sparkles, ChevronDown, Layers,
+  LogIn, LogOut
 } from 'lucide-react';
+
+type PreviewAuthUser = { uid: string; email: string | null };
 
 export function EditorTopBar() {
   const {
@@ -28,13 +31,57 @@ export function EditorTopBar() {
     config
   } = useStorefrontCms();
 
+  // Track the auth state of the iframe's live storefront. The
+  // IframeStorefrontCanvas listens for `cms:auth:state` postMessages
+  // from the commerce site and re-broadcasts the user (or null) here.
+  // The toggle reads this to decide between "Sign in to preview" and
+  // "Sign out".
+  const [previewUser, setPreviewUser] = useState<PreviewAuthUser | null>(null);
+  useEffect(() => {
+    const onAuthState = (e: Event) => {
+      const detail = (e as CustomEvent<{ user: PreviewAuthUser | null }>).detail;
+      setPreviewUser(detail?.user ?? null);
+    };
+    window.addEventListener('neria:editor:auth-state', onAuthState as EventListener);
+    return () => window.removeEventListener('neria:editor:auth-state', onAuthState as EventListener);
+  }, []);
+
+  const handleAuthToggle = () => {
+    if (previewUser) {
+      // Sign the iframe out: write 'out' to localStorage and reload.
+      window.dispatchEvent(
+        new CustomEvent('neria:editor:set-preview-auth', { detail: { state: 'out' } }),
+      );
+    } else {
+      // Sign the iframe in: write 'in' to localStorage and navigate
+      // the iframe to the storefront's own /auth page.
+      window.dispatchEvent(
+        new CustomEvent('neria:editor:set-preview-auth', { detail: { state: 'in' } }),
+      );
+      window.dispatchEvent(
+        new CustomEvent('neria:editor:navigate', { detail: { path: '/auth?edit=1' } }),
+      );
+    }
+  };
+
+  // The dropdown lists the real neria_commerce routes. Every page the
+  // user can land on is here, with at least one representative
+  // dynamic route (e.g. an example product slug, an example order id)
+  // so the iframe renders something meaningful.
   const pagesList = [
-    { id: 'homepage', label: 'Homepage' },
-    { id: 'about', label: 'About Us & Atelier' },
-    { id: 'contact', label: 'Contact & Concierge' },
-    { id: 'faq', label: 'Frequently Asked Questions' },
-    { id: 'shipping-returns', label: 'Shipping & Exchanges' },
-    { id: 'size-guide', label: 'Official Size Guide' }
+    { id: 'homepage', label: 'Homepage', path: '/' },
+    { id: 'shop', label: 'Shop', path: '/shop' },
+    { id: 'trending', label: 'Trending', path: '/trending' },
+    { id: 'product', label: 'Product', path: '/product/dollhouse-bunny-tote' },
+    { id: 'cart', label: 'Cart', path: '/cart' },
+    { id: 'checkout', label: 'Checkout', path: '/checkout' },
+    { id: 'auth', label: 'Sign In / Sign Up', path: '/auth' },
+    { id: 'account', label: 'Account', path: '/account' },
+    { id: 'orders', label: 'Orders', path: '/orders' },
+    { id: 'order', label: 'Order Detail', path: '/order/example-order' },
+    { id: 'orderTrack', label: 'Order Tracking', path: '/order/track/example' },
+    { id: 'cart-empty', label: 'Cart (Empty)', path: '/cart?empty=1' },
+    { id: 'orders-empty', label: 'Orders (Empty)', path: '/orders?empty=1' },
   ];
 
   return (
@@ -66,7 +113,15 @@ export function EditorTopBar() {
         <div className="relative">
           <select
             value={activePageId}
-            onChange={e => setActivePageId(e.target.value)}
+            onChange={e => {
+              const next = e.target.value;
+              setActivePageId(next);
+              const path = pagesList.find(p => p.id === next)?.path ?? '/';
+              // Bump the iframe to the new route. We round-trip through a
+              // window-level event so the canvas (and the left sidebar)
+              // can react.
+              window.dispatchEvent(new CustomEvent('neria:editor:navigate', { detail: { path } }));
+            }}
             className="appearance-none pl-3 pr-8 py-1.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 text-xs font-bold text-white focus:outline-none focus:ring-1 focus:ring-[#FF4FA3] cursor-pointer"
           >
             {pagesList.map(p => (
@@ -169,6 +224,36 @@ export function EditorTopBar() {
         >
           <Eye className="w-3.5 h-3.5" />
           <span className="hidden sm:inline">{previewMode ? 'Exit Preview' : 'Preview'}</span>
+        </button>
+
+        {/* Auth preview toggle — flips the iframe between
+            unauthenticated (default) and the admin's own auth state.
+            The localStorage flag lives in the iframe's origin, so the
+            main commerce site is unaffected. */}
+        <button
+          onClick={handleAuthToggle}
+          title={
+            previewUser
+              ? `Signed in as ${previewUser.email ?? previewUser.uid} — click to sign out of the preview`
+              : 'Open the sign-in page in the live preview'
+          }
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+            previewUser
+              ? 'bg-[#12B76A] hover:bg-[#039855] text-white shadow-sm'
+              : 'bg-white/10 hover:bg-white/20 text-white'
+          }`}
+        >
+          {previewUser ? (
+            <>
+              <LogOut className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Sign out</span>
+            </>
+          ) : (
+            <>
+              <LogIn className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Sign in to preview</span>
+            </>
+          )}
         </button>
 
         {/* Save Draft */}

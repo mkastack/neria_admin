@@ -102,9 +102,9 @@ export default function TransactionsPage() {
                       {tx.type}
                     </span>
                   </td>
-                  <td className="py-3.5 px-3 font-bold text-[#263550]">GH₵ {tx.amount}</td>
-                  <td className="py-3.5 px-3 text-[#98A0AE]">GH₵ {tx.fee}</td>
-                  <td className="py-3.5 px-3 font-bold text-[#FF4FA3]">GH₵ {tx.net}</td>
+                  <td className="py-3.5 px-3 font-bold text-[#263550]">$ {tx.amount}</td>
+                  <td className="py-3.5 px-3 text-[#98A0AE]">$ {tx.fee}</td>
+                  <td className="py-3.5 px-3 font-bold text-[#FF4FA3]">$ {tx.net}</td>
                   <td className="py-3.5 px-3">
                     <StatusBadge status={tx.status} />
                   </td>
@@ -129,7 +129,7 @@ export default function TransactionsPage() {
           <div className="space-y-6">
             <div className="p-4 rounded-2xl bg-[#FFF4F8] border border-[#FFD8EA] text-center">
               <span className="text-[11px] font-bold text-[#98A0AE] uppercase">Net Settlement Amount</span>
-              <h2 className="text-2xl font-extrabold text-[#263550] mt-1">GH₵ {selectedTx.net}</h2>
+              <h2 className="text-2xl font-extrabold text-[#263550] mt-1">$ {selectedTx.net}</h2>
               <span className="inline-block mt-1">
                 <StatusBadge status={selectedTx.status} />
               </span>
@@ -155,12 +155,12 @@ export default function TransactionsPage() {
 
               <div className="flex justify-between py-2 border-b border-[#F2F3F5]">
                 <span className="text-[#667085]">Gross Amount</span>
-                <span className="font-bold text-[#263550]">GH₵ {selectedTx.amount}</span>
+                <span className="font-bold text-[#263550]">$ {selectedTx.amount}</span>
               </div>
 
               <div className="flex justify-between py-2 border-b border-[#F2F3F5]">
                 <span className="text-[#667085]">Gateway Processing Fee</span>
-                <span className="text-[#B42318] font-bold">- GH₵ {selectedTx.fee}</span>
+                <span className="text-[#B42318] font-bold">- $ {selectedTx.fee}</span>
               </div>
 
               <div className="flex justify-between py-2 border-b border-[#F2F3F5]">

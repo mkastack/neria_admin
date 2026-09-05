@@ -3,16 +3,43 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { BunnyMascot } from '@/src/components/ui/BunnyMascot';
-import { Mail, ArrowLeft, Send, CheckCircle2 } from 'lucide-react';
+import { Mail, ArrowLeft, Send, CheckCircle2, AlertCircle } from 'lucide-react';
+import {
+  requestAdminPasswordReset,
+  friendlyAuthError,
+} from '@/src/lib/firebase/auth';
+import { useAdmin } from '@/src/lib/context/AdminContext';
 
 export default function ForgotPasswordPage() {
+  const { addToast } = useAdmin();
   const [email, setEmail] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
-    setIsSubmitted(true);
+    setIsLoading(true);
+    setError(null);
+    try {
+      await requestAdminPasswordReset(email);
+      setIsSubmitted(true);
+      addToast({
+        type: 'success',
+        title: 'Reset link sent',
+        description: `Check ${email} for instructions.`,
+      });
+    } catch (err: any) {
+      const code = typeof err?.code === 'string' ? err.code : 'unknown';
+      const friendly =
+        code === 'functions/invalid-argument'
+          ? 'Please enter a valid email address.'
+          : friendlyAuthError(code);
+      setError(friendly);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -41,18 +68,27 @@ export default function ForgotPasswordPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="founder@neriacollective.com"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#DDE1E7] text-sm text-[#263550] outline-none"
+                  placeholder="you@neriacollective.com"
+                  autoComplete="email"
+                  className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#DDE1E7] text-sm text-[#263550] outline-none focus:border-[#FFD8EA] focus:ring-2 focus:ring-[#FFD8EA]/40"
                 />
               </div>
             </div>
 
+            {error && (
+              <div className="p-3 rounded-xl bg-[#FEF3F2] border border-[#FECDCA] flex items-start gap-2 text-xs text-[#B42318]">
+                <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+                <span className="font-semibold">{error}</span>
+              </div>
+            )}
+
             <button
               type="submit"
-              className="w-full neria-btn-primary py-3 text-xs font-bold inline-flex items-center justify-center gap-2 cursor-pointer"
+              disabled={isLoading}
+              className="w-full neria-btn-primary py-3 text-xs font-bold inline-flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
             >
               <Send className="w-4 h-4" />
-              <span>Send Recovery Link ♡</span>
+              <span>{isLoading ? 'Sending…' : 'Send Recovery Link ♡'}</span>
             </button>
           </form>
         ) : (

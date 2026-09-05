@@ -15,9 +15,9 @@ export default function SettingsPage() {
   // General Settings State
   const [storeName, setStoreName] = useState('Neria Collective');
   const [supportEmail, setSupportEmail] = useState('care@neriacollective.com');
-  const [supportPhone, setSupportPhone] = useState('+233 24 559 8812');
-  const [currency, setCurrency] = useState('GH₵ (Ghanaian Cedi)');
-  const [timezone, setTimezone] = useState('GMT+0 (Accra / London)');
+  const [supportPhone, setSupportPhone] = useState('+1 (212) 555-0100');
+  const [currency, setCurrency] = useState('$ (US Dollar)');
+  const [timezone, setTimezone] = useState('GMT-5 (New York / EST)');
 
   // Checkout Toggles
   const [guestCheckout, setGuestCheckout] = useState(true);
@@ -262,8 +262,8 @@ export default function SettingsPage() {
               <h4 className="text-xs font-bold text-[#263550] mb-2">Active Admin Sessions</h4>
               <div className="p-3 bg-[#F8F8FA] rounded-2xl text-xs flex items-center justify-between">
                 <div>
-                  <p className="font-bold text-[#263550]">Chrome on Windows (Accra, Ghana)</p>
-                  <p className="text-[10px] text-[#98A0AE]">Current active session • IP 197.251.134.12</p>
+                  <p className="font-bold text-[#263550]">Chrome on macOS (New York, NY)</p>
+                  <p className="text-[10px] text-[#98A0AE]">Current active session • IP 24.104.18.42</p>
                 </div>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#ECFDF3] text-[#027A48]">Active Now</span>
               </div>

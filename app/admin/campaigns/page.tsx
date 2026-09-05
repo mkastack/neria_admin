@@ -78,7 +78,7 @@ export default function CampaignsPage() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard
           title="Attributed Revenue"
-          value={`GH₵ ${totalAttributed.toLocaleString()}`}
+          value={`$ ${totalAttributed.toLocaleString()}`}
           change="+24.5% vs Last Month"
           isPositive={true}
           theme="pink"
@@ -123,7 +123,7 @@ export default function CampaignsPage() {
               <div className="grid grid-cols-3 gap-2 mt-4 p-3 bg-[#F8F8FA] rounded-2xl text-center text-xs">
                 <div>
                   <span className="text-[10px] text-[#98A0AE]">Attributed</span>
-                  <p className="font-bold text-[#FF4FA3]">GH₵ {camp.revenue.toLocaleString()}</p>
+                  <p className="font-bold text-[#FF4FA3]">$ {camp.revenue.toLocaleString()}</p>
                 </div>
                 <div>
                   <span className="text-[10px] text-[#98A0AE]">Clicks</span>

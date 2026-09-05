@@ -25,7 +25,7 @@ export default function OrdersPage() {
   const [newOrderCustomer, setNewOrderCustomer] = useState('');
   const [newOrderEmail, setNewOrderEmail] = useState('');
   const [newOrderPhone, setNewOrderPhone] = useState('');
-  const [newOrderCity, setNewOrderCity] = useState('Accra');
+  const [newOrderCity, setNewOrderCity] = useState('New York');
   const [newOrderTotal, setNewOrderTotal] = useState('420');
 
   const tabs = [
@@ -89,7 +89,7 @@ export default function OrdersPage() {
         id: `cust-${Date.now()}`,
         name: newOrderCustomer,
         email: newOrderEmail || 'customer@neriacollective.com',
-        phone: newOrderPhone || '+233 24 000 0000',
+        phone: newOrderPhone || '+1 (212) 555-0100',
         avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80'
       },
       createdAt: new Date().toISOString(),
@@ -110,13 +110,13 @@ export default function OrdersPage() {
       ],
       paymentStatus: 'Paid',
       fulfillmentStatus: 'Processing',
-      paymentMethod: 'MTN Mobile Money',
+      paymentMethod: 'Stripe (Card)',
       deliveryMethod: 'Standard Delivery',
       deliveryAddress: {
-        street: 'East Legon Showroom Pickup',
+        street: '226 W 26th St Showroom Pickup',
         city: newOrderCity,
-        region: 'Greater Accra',
-        country: 'Ghana'
+        region: 'NY',
+        country: 'United States'
       },
       subtotal: parseFloat(newOrderTotal) || 420,
       discount: 0,
@@ -147,7 +147,7 @@ export default function OrdersPage() {
         <div>
           <h1 className="text-2xl font-bold text-[#263550]">Orders Management</h1>
           <p className="text-xs text-[#667085] mt-0.5">
-            Track and fulfill customer purchases across Ghana and worldwide.
+            Track and fulfill customer purchases across the US and worldwide.
           </p>
         </div>
 
@@ -347,7 +347,7 @@ export default function OrdersPage() {
                         <span className="truncate block max-w-[120px]">{order.deliveryAddress.city}</span>
                       </td>
                       <td className="py-3.5 px-3 font-bold text-[#263550]">
-                        GH₵ {order.total}
+                        ${order.total}
                       </td>
                       <td className="py-3.5 px-4 text-right">
                         <div className="flex items-center justify-end gap-1.5">
@@ -415,7 +415,7 @@ export default function OrdersPage() {
                 type="tel"
                 value={newOrderPhone}
                 onChange={(e) => setNewOrderPhone(e.target.value)}
-                placeholder="+233 24..."
+                placeholder="+1 (212) 555-0100"
                 className="w-full px-3.5 py-2 rounded-xl border border-[#DDE1E7] text-sm text-[#263550] outline-none"
               />
             </div>
@@ -429,14 +429,14 @@ export default function OrdersPage() {
                 onChange={(e) => setNewOrderCity(e.target.value)}
                 className="w-full px-3.5 py-2 rounded-xl border border-[#DDE1E7] text-sm text-[#263550] bg-white outline-none"
               >
-                <option value="Accra">Accra Central</option>
-                <option value="East Legon">East Legon / Airport</option>
-                <option value="Kumasi">Kumasi (Ashanti)</option>
-                <option value="Takoradi">Takoradi</option>
+                <option value="New York">New York</option>
+                <option value="Los Angeles">Los Angeles</option>
+                <option value="Chicago">Chicago</option>
+                <option value="Seattle">Seattle</option>
               </select>
             </div>
             <div>
-              <label className="block text-xs font-bold text-[#263550] mb-1">Order Amount (GH₵)</label>
+              <label className="block text-xs font-bold text-[#263550] mb-1">Order Amount ($)</label>
               <input
                 type="number"
                 value={newOrderTotal}

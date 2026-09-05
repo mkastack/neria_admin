@@ -10,10 +10,11 @@ import {
   Tag, Eye, Save
 } from 'lucide-react';
 import { Product, ProductVariant } from '@/src/lib/types';
+import { createProduct } from '@/src/lib/firebase/products';
 
 export default function AddProductPage() {
   const router = useRouter();
-  const { products, setProducts, addToast } = useAdmin();
+  const { addToast } = useAdmin();
 
   // Form State
   const [name, setName] = useState('');
@@ -81,7 +82,7 @@ export default function AddProductPage() {
     setImages(prev => prev.filter((_, i) => i !== index));
   };
 
-  const handleSaveProduct = (e?: React.FormEvent) => {
+  const handleSaveProduct = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!name.trim()) {
       addToast({
@@ -92,10 +93,11 @@ export default function AddProductPage() {
       return;
     }
 
-    const newProd: Product = {
-      id: `prod-${Date.now()}`,
+    const slug = name.toLowerCase().replace(/ /g, '-').replace(/[^a-z0-9-]/g, '');
+
+    const newProd: Omit<Product, 'id'> = {
       name,
-      slug: name.toLowerCase().replace(/ /g, '-'),
+      slug,
       description: description || 'Beautiful piece from Neria Collective.',
       shortDescription: shortDescription || 'Signature Neria style apparel.',
       category,
@@ -129,13 +131,21 @@ export default function AddProductPage() {
       createdAt: new Date().toISOString()
     };
 
-    setProducts([newProd, ...products]);
-    addToast({
-      type: 'success',
-      title: 'Product Published ♡',
-      description: `${name} has been added to your live store catalog.`
-    });
-    router.push('/admin/products');
+    try {
+      await createProduct(newProd);
+      addToast({
+        type: 'success',
+        title: 'Product Published ♡',
+        description: `${name} has been added to your live store catalog.`
+      });
+      router.push('/admin/products');
+    } catch (err) {
+      addToast({
+        type: 'error',
+        title: 'Save failed',
+        description: err instanceof Error ? err.message : 'Could not save to Firestore.',
+      });
+    }
   };
 
   return (
@@ -283,7 +293,7 @@ export default function AddProductPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
-                <label className="block text-xs font-bold text-[#263550] mb-1">Selling Price (GH₵) *</label>
+                <label className="block text-xs font-bold text-[#263550] mb-1">Selling Price ($) *</label>
                 <input
                   type="number"
                   value={price}
@@ -293,7 +303,7 @@ export default function AddProductPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#667085] mb-1">Compare-at Price (GH₵)</label>
+                <label className="block text-xs font-bold text-[#667085] mb-1">Compare-at Price ($)</label>
                 <input
                   type="number"
                   value={comparePrice}
@@ -303,7 +313,7 @@ export default function AddProductPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#667085] mb-1">Cost per Item (GH₵)</label>
+                <label className="block text-xs font-bold text-[#667085] mb-1">Cost per Item ($)</label>
                 <input
                   type="number"
                   value={cost}
@@ -317,7 +327,7 @@ export default function AddProductPage() {
             <div className="p-4 rounded-2xl bg-[#FFF4F8] border border-[#FFD8EA] grid grid-cols-2 sm:grid-cols-3 gap-4 text-center">
               <div>
                 <p className="text-[11px] text-[#98A0AE] font-medium">Profit per Unit</p>
-                <p className="text-base font-extrabold text-[#263550]">GH₵ {profit}</p>
+                <p className="text-base font-extrabold text-[#263550]">$ {profit}</p>
               </div>
               <div>
                 <p className="text-[11px] text-[#98A0AE] font-medium">Gross Margin</p>
@@ -326,7 +336,7 @@ export default function AddProductPage() {
               <div className="col-span-2 sm:col-span-1">
                 <p className="text-[11px] text-[#98A0AE] font-medium">Discount Offer</p>
                 <p className="text-base font-bold text-[#027A48]">
-                  {comparePrice > price ? `Save GH₵ ${comparePrice - price}` : 'Full Price'}
+                  {comparePrice > price ? `Save $ ${comparePrice - price}` : 'Full Price'}
                 </p>
               </div>
             </div>
@@ -398,7 +408,7 @@ export default function AddProductPage() {
                       <tr key={idx}>
                         <td className="py-2 font-bold text-[#263550]">{v.name}</td>
                         <td className="py-2 text-[#98A0AE]">{v.sku}</td>
-                        <td className="py-2 font-semibold">GH₵ {v.price}</td>
+                        <td className="py-2 font-semibold">$ {v.price}</td>
                         <td className="py-2 text-[#027A48] font-bold">{v.stock} units</td>
                       </tr>
                     ))}

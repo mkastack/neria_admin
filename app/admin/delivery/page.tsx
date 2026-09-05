@@ -18,7 +18,7 @@ export default function DeliveryDispatchPage() {
     addToast({
       type: 'info',
       title: 'Dialing Courier Dispatch',
-      description: `Calling ${phone || '+233 54 880 1192'}...`
+      description: `Calling ${phone || '+1 (212) 555-0210'}...`
     });
   };
 
@@ -29,7 +29,7 @@ export default function DeliveryDispatchPage() {
         <div>
           <h1 className="text-2xl font-bold text-[#263550]">Courier & Delivery Dispatch</h1>
           <p className="text-xs text-[#667085] mt-0.5">
-            Live motorcycle tracking, Accra courier assignments, and doorstep fulfillment telemetry.
+            Live courier tracking, US-wide dispatch assignments, and doorstep fulfillment telemetry.
           </p>
         </div>
       </div>
@@ -41,7 +41,7 @@ export default function DeliveryDispatchPage() {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-base font-bold text-[#263550] flex items-center gap-2">
-                <Navigation className="w-4 h-4 text-[#FF4FA3]" /> Greater Accra Live Dispatch Map
+                <Navigation className="w-4 h-4 text-[#FF4FA3]" /> US Live Dispatch Map
               </h3>
               <p className="text-xs text-[#667085]">Real-time courier positioning and route density</p>
             </div>
@@ -65,7 +65,7 @@ export default function DeliveryDispatchPage() {
               <path d="M 120 20 Q 300 240 600 280" fill="none" stroke="#0284C7" strokeWidth="2.5" strokeDasharray="4 4" />
             </svg>
 
-            {/* Hub Central Pin (East Legon Showroom) */}
+            {/* Hub Central Pin (New York Showroom) */}
             <div className="absolute top-1/2 left-1/3 -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center">
               <div className="p-2 rounded-2xl bg-[#FF4FA3] text-white shadow-lg ring-4 ring-[#FFF4F8]">
                 <Sparkles className="w-5 h-5" />

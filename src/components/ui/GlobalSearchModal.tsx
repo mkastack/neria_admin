@@ -16,13 +16,7 @@ const RECENT = [
 
 const QUICK_LINKS = [
   { title: 'Live Visual Website Editor', url: '/admin/website/editor', group: 'Website CMS', icon: '✨' },
-  { title: 'Homepage Hero & Lookbooks', url: '/admin/website/editor?section=sec-hero', group: 'Website CMS', icon: '🎀' },
-  { title: 'Announcement Bar Manager', url: '/admin/website/announcements', group: 'Website CMS', icon: '📢' },
-  { title: 'Promotional Popups (15% Off)', url: '/admin/website/popups', group: 'Website CMS', icon: '🎁' },
-  { title: 'Brand Assets & Bunny Library', url: '/admin/website/brand', group: 'Website CMS', icon: '🐰' },
-  { title: 'Theme Colors & CSS Variables', url: '/admin/website/theme', group: 'Website CMS', icon: '🎨' },
-  { title: 'Store Pages (About, FAQ, Size Guide)', url: '/admin/website/pages', group: 'Website CMS', icon: '📄' },
-  { title: 'SEO Previews & Google Health', url: '/admin/website/seo', group: 'Website CMS', icon: '🌐' },
+  { title: 'Storefront Overview', url: '/admin/website', group: 'Website CMS', icon: '🎀' },
   { title: 'Overview Dashboard', url: '/admin', group: 'Navigation', icon: '📊' },
   { title: 'Orders & Shipments', url: '/admin/orders', group: 'Commerce', icon: '📦' },
   { title: 'Products & Lookbooks', url: '/admin/products', group: 'Commerce', icon: '👗' },
@@ -239,7 +233,7 @@ export function GlobalSearchModal() {
                       onClick={() => navigateTo('/admin/products')}
                       left={<img src={prod.images[0]} alt={prod.name} className="w-9 h-9 rounded-xl object-cover border border-[#F2F3F5]" />}
                       title={prod.name}
-                      subtitle={`${prod.sku} • GH₵ ${prod.price}`}
+                      subtitle={`${prod.sku} • $ ${prod.price}`}
                       query={q}
                     />
                   ))}
@@ -259,7 +253,7 @@ export function GlobalSearchModal() {
                         </div>
                       }
                       title={`${ord.orderNumber} — ${ord.customer.name}`}
-                      subtitle={`GH₵ ${ord.total} • ${ord.paymentStatus} • ${ord.fulfillmentStatus}`}
+                      subtitle={`$ ${ord.total} • ${ord.paymentStatus} • ${ord.fulfillmentStatus}`}
                       query={q}
                     />
                   ))}

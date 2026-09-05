@@ -2,8 +2,12 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useAdmin } from '@/src/lib/context/AdminContext';
+import { useAuthUser } from '@/src/lib/firebase/auth';
+import { useUserProfile } from '@/src/lib/firebase/users';
+import { signOutUser } from '@/src/lib/firebase/auth';
+import { ROLE_LABELS, type Role } from '@/src/lib/rbac';
 import { QuickAddMenu } from '../ui/QuickAddMenu';
 import {
   Menu, Search, Bell, HelpCircle, ExternalLink,
@@ -13,6 +17,7 @@ import {
 
 export function AdminHeader() {
   const pathname = usePathname();
+  const router = useRouter();
   const {
     isSidebarCollapsed,
     toggleSidebar,
@@ -21,7 +26,11 @@ export function AdminHeader() {
     setIsNotificationsOpen,
     setIsHelpOpen,
     notifications,
+    addToast,
   } = useAdmin();
+
+  const { user } = useAuthUser();
+  const { profile } = useUserProfile(user?.uid ?? null);
 
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
@@ -39,7 +48,6 @@ export function AdminHeader() {
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
-  // Format Page Title & Breadcrumb from path
   const getPageMeta = () => {
     if (pathname === '/admin') return { title: 'Overview Dashboard', breadcrumb: ['Admin', 'Dashboard'] };
     const parts = pathname.split('/').filter(Boolean);
@@ -52,8 +60,30 @@ export function AdminHeader() {
 
   const { title, breadcrumb } = getPageMeta();
 
-  // Quick search suggestions for the bar
-  const suggestions = ['Pink Bunny Hoodie', 'Orders today', 'Inventory low stock', 'VIP Customers'];
+  const displayName = profile?.name || user?.displayName || user?.email?.split('@')[0] || 'Admin';
+  const displayEmail = user?.email || '';
+  const displayAvatar = profile?.photoURL || user?.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=FFD8EA&color=FF4FA3&size=160`;
+  const displayRole: Role = profile?.role || 'super_admin';
+  const roleLabel = ROLE_LABELS[displayRole] ?? 'Staff';
+
+  const handleSignOut = async () => {
+    try {
+      await signOutUser();
+      setIsProfileOpen(false);
+      router.push('/admin/login');
+      addToast({
+        type: 'info',
+        title: 'Signed out',
+        description: 'You have been signed out of the admin console.',
+      });
+    } catch (err) {
+      addToast({
+        type: 'error',
+        title: 'Sign-out failed',
+        description: err instanceof Error ? err.message : 'Please try again.',
+      });
+    }
+  };
 
   return (
     <header
@@ -67,7 +97,6 @@ export function AdminHeader() {
     >
       {/* ── Left: Hamburger / Collapse + Breadcrumb ── */}
       <div className="flex items-center gap-2 shrink-0">
-        {/* Mobile Hamburger */}
         <button
           onClick={toggleMobileSidebar}
           className="lg:hidden p-2 rounded-xl text-[#263550] hover:bg-[#FFF4F8] transition-colors cursor-pointer"
@@ -75,7 +104,6 @@ export function AdminHeader() {
           <Menu className="w-5 h-5" />
         </button>
 
-        {/* Desktop collapse toggle */}
         <button
           onClick={toggleSidebar}
           className="hidden lg:flex items-center justify-center w-8 h-8 rounded-xl text-[#98A0AE] hover:text-[#FF4FA3] hover:bg-[#FFF4F8] transition-all cursor-pointer"
@@ -87,10 +115,8 @@ export function AdminHeader() {
           }
         </button>
 
-        {/* Divider */}
         <div className="hidden sm:block w-px h-6 bg-[#F2F3F5] mx-1" />
 
-        {/* Breadcrumb */}
         <div className="hidden sm:block">
           <div className="flex items-center gap-1 text-[10px] text-[#B0B8C5] mb-0.5 font-medium">
             {breadcrumb.map((crumb, idx) => (
@@ -129,7 +155,6 @@ export function AdminHeader() {
                 : '0 1px 4px rgba(38,53,80,0.05)',
             }}
           >
-            {/* Search icon with pink glow on focus */}
             <div
               className="flex items-center justify-center shrink-0 transition-all duration-300"
               style={{
@@ -139,7 +164,6 @@ export function AdminHeader() {
               <Search className="w-4 h-4" />
             </div>
 
-            {/* Placeholder text with cycling suggestions */}
             <div className="flex-1 flex items-center gap-2 min-w-0">
               <span
                 className="text-sm transition-colors duration-300 truncate"
@@ -155,7 +179,6 @@ export function AdminHeader() {
               </span>
             </div>
 
-            {/* Right side: Sparkle + Keyboard shortcut */}
             <div className="flex items-center gap-2 shrink-0">
               <div
                 className="hidden lg:flex items-center gap-1 transition-opacity duration-200"
@@ -189,7 +212,6 @@ export function AdminHeader() {
 
       {/* ── Right: Actions ── */}
       <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 ml-auto">
-        {/* Mobile Search */}
         <button
           onClick={() => setIsSearchOpen(true)}
           className="md:hidden p-2 rounded-xl text-[#98A0AE] hover:text-[#FF4FA3] hover:bg-[#FFF4F8] transition-colors"
@@ -197,7 +219,6 @@ export function AdminHeader() {
           <Search className="w-5 h-5" />
         </button>
 
-        {/* View Store */}
         <a
           href="https://neriacollective.com"
           target="_blank"
@@ -208,10 +229,8 @@ export function AdminHeader() {
           <ExternalLink className="w-3 h-3" />
         </a>
 
-        {/* + Add New */}
         <QuickAddMenu />
 
-        {/* Notifications */}
         <button
           onClick={() => setIsNotificationsOpen(true)}
           className="relative p-2 rounded-xl text-[#98A0AE] hover:text-[#FF4FA3] hover:bg-[#FFF4F8] transition-all cursor-pointer group"
@@ -224,7 +243,6 @@ export function AdminHeader() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FF4FA3] opacity-60" />
                 <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#FF4FA3]" />
               </span>
-              {/* Badge count */}
               {unreadCount > 1 && (
                 <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 bg-[#FF4FA3] text-white text-[9px] font-black rounded-full flex items-center justify-center px-1 ring-2 ring-white">
                   {unreadCount > 9 ? '9+' : unreadCount}
@@ -234,7 +252,6 @@ export function AdminHeader() {
           )}
         </button>
 
-        {/* Help */}
         <button
           onClick={() => setIsHelpOpen(true)}
           className="p-2 rounded-xl text-[#98A0AE] hover:text-[#FF4FA3] hover:bg-[#FFF4F8] transition-all cursor-pointer group"
@@ -242,7 +259,6 @@ export function AdminHeader() {
           <HelpCircle className="w-5 h-5 transition-transform group-hover:scale-110" />
         </button>
 
-        {/* Divider */}
         <div className="w-px h-6 bg-[#F2F3F5] mx-0.5 hidden sm:block" />
 
         {/* Profile Avatar */}
@@ -260,18 +276,17 @@ export function AdminHeader() {
               }}
             >
               <img
-                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&q=80"
-                alt="Profile"
+                src={displayAvatar}
+                alt={displayName}
                 className="w-full h-full object-cover"
               />
             </div>
             <div className="hidden lg:block text-left">
-              <p className="text-xs font-bold text-[#263550] leading-tight">Neria Founder</p>
-              <p className="text-[10px] text-[#98A0AE] leading-tight">Super Admin</p>
+              <p className="text-xs font-bold text-[#263550] leading-tight">{displayName}</p>
+              <p className="text-[10px] text-[#98A0AE] leading-tight">{roleLabel}</p>
             </div>
           </button>
 
-          {/* Profile Dropdown */}
           {isProfileOpen && (
             <div
               className="absolute right-0 mt-2 w-60 rounded-2xl py-2 z-50"
@@ -290,19 +305,18 @@ export function AdminHeader() {
                 }
               `}</style>
 
-              {/* Header */}
               <div className="px-4 py-3 border-b border-[#F8F8FA]">
                 <div className="flex items-center gap-3">
                   <img
-                    src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&q=80"
-                    alt="Profile"
+                    src={displayAvatar}
+                    alt={displayName}
                     className="w-10 h-10 rounded-xl object-cover ring-2 ring-[#FFD8EA]"
                   />
-                  <div>
-                    <p className="text-sm font-bold text-[#263550]">Neria Founder</p>
-                    <p className="text-xs text-[#98A0AE]">founder@neriacollective.com</p>
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold text-[#263550] truncate">{displayName}</p>
+                    <p className="text-xs text-[#98A0AE] truncate">{displayEmail}</p>
                     <span className="inline-flex items-center gap-1 mt-0.5 px-1.5 py-0.5 rounded-full bg-[#FFF4F8] text-[10px] font-bold text-[#FF4FA3]">
-                      ✦ Super Admin
+                      ✦ {roleLabel}
                     </span>
                   </div>
                 </div>
@@ -323,23 +337,24 @@ export function AdminHeader() {
                 >
                   <Settings className="w-4 h-4" /> Store Preferences
                 </Link>
-                <Link
-                  href="/admin/roles"
-                  onClick={() => setIsProfileOpen(false)}
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#475467] hover:bg-[#FFF4F8] hover:text-[#FF4FA3] transition-colors"
-                >
-                  <Shield className="w-4 h-4" /> Roles & Security
-                </Link>
+                {(displayRole === 'super_admin' || displayRole === 'store_manager') && (
+                  <Link
+                    href="/admin/roles"
+                    onClick={() => setIsProfileOpen(false)}
+                    className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#475467] hover:bg-[#FFF4F8] hover:text-[#FF4FA3] transition-colors"
+                  >
+                    <Shield className="w-4 h-4" /> Roles & Security
+                  </Link>
+                )}
               </div>
 
               <div className="p-2 pt-1 border-t border-[#F8F8FA]">
-                <Link
-                  href="/admin/login"
-                  onClick={() => setIsProfileOpen(false)}
-                  className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#B42318] hover:bg-[#FEF3F2] transition-colors"
+                <button
+                  onClick={handleSignOut}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-[#B42318] hover:bg-[#FEF3F2] transition-colors text-left"
                 >
                   <LogOut className="w-4 h-4" /> Sign Out
-                </Link>
+                </button>
               </div>
             </div>
           )}

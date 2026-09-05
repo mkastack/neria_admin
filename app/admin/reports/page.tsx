@@ -13,7 +13,7 @@ export default function ReportsPage() {
     { title: 'Inventory Valuation Report', desc: 'Current SKU stock levels, warehouse cost bases, and reorder warnings.', format: 'CSV' },
     { title: 'Customer Lifetime Value', desc: 'VIP segment order histories, AOV metrics, and repeat purchase frequencies.', format: 'CSV' },
     { title: 'Returns & Exchange Log', desc: 'Summary of return reasons, sizing complaints, and refund reversals.', format: 'CSV' },
-    { title: 'Tax & Compliance Export', desc: 'Ghana GRA tax breakdown and statutory commerce invoices.', format: 'PDF / CSV' }
+    { title: 'Tax & Compliance Export', desc: 'US sales tax breakdown and statutory commerce invoices.', format: 'PDF / CSV' }
   ];
 
   const handleDownload = (title: string) => {

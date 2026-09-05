@@ -40,7 +40,7 @@ export default function GiftCardsPage() {
     addToast({
       type: 'success',
       title: 'Gift Card Issued ♡',
-      description: `GH₵ ${initialValue} digital gift card created.`
+      description: `$ ${initialValue} digital gift card created.`
     });
   };
 
@@ -68,7 +68,7 @@ export default function GiftCardsPage() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard
           title="Total Gift Cards Issued"
-          value={`GH₵ ${totalIssued.toLocaleString()}`}
+          value={`$ ${totalIssued.toLocaleString()}`}
           change="Lifetime Value"
           isPositive={true}
           theme="pink"
@@ -76,7 +76,7 @@ export default function GiftCardsPage() {
         />
         <StatCard
           title="Redeemed Credits"
-          value={`GH₵ ${totalRedeemed.toLocaleString()}`}
+          value={`$ ${totalRedeemed.toLocaleString()}`}
           change="Used in Checkout"
           isPositive={true}
           theme="white"
@@ -84,7 +84,7 @@ export default function GiftCardsPage() {
         />
         <StatCard
           title="Outstanding Balance"
-          value={`GH₵ ${totalBalance.toLocaleString()}`}
+          value={`$ ${totalBalance.toLocaleString()}`}
           change="Available to Spend"
           isPositive={true}
           theme="blue"
@@ -117,10 +117,10 @@ export default function GiftCardsPage() {
                     <p className="text-[11px] text-[#98A0AE]">{card.customerEmail || 'Direct Code'}</p>
                   </td>
                   <td className="py-3.5 px-3 font-semibold text-[#667085]">
-                    GH₵ {card.initialValue}
+                    $ {card.initialValue}
                   </td>
                   <td className="py-3.5 px-3 font-bold text-[#FF4FA3]">
-                    GH₵ {card.balance}
+                    $ {card.balance}
                   </td>
                   <td className="py-3.5 px-3">
                     <StatusBadge status={card.status} />
@@ -144,7 +144,7 @@ export default function GiftCardsPage() {
       >
         <form onSubmit={handleIssueGiftCard} className="space-y-4">
           <div>
-            <label className="block text-xs font-bold text-[#263550] mb-1">Card Value (GH₵) *</label>
+            <label className="block text-xs font-bold text-[#263550] mb-1">Card Value ($) *</label>
             <input
               type="number"
               required

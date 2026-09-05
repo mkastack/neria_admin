@@ -65,7 +65,7 @@ export default function AnalyticsPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           title="Monthly Gross Sales"
-          value="GH₵ 48,920"
+          value="$ 48,920"
           change="+18.2%"
           isPositive={true}
           theme="pink"
@@ -103,14 +103,14 @@ export default function AnalyticsPage() {
         <div className="bg-white p-6 rounded-3xl border border-[#F2F3F5] shadow-xs space-y-4">
           <div>
             <h3 className="text-base font-bold text-[#263550]">Revenue Velocity (Last 7 Days)</h3>
-            <p className="text-xs text-[#667085]">Daily gross revenue in Ghanaian Cedis</p>
+            <p className="text-xs text-[#667085]">Daily gross revenue in US Dollars</p>
           </div>
 
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={mockRevenueTrend}>
                 <XAxis dataKey="date" stroke="#98A0AE" fontSize={11} tickLine={false} />
-                <YAxis stroke="#98A0AE" fontSize={11} tickLine={false} tickFormatter={(v) => `GH₵${v / 1000}k`} />
+                <YAxis stroke="#98A0AE" fontSize={11} tickLine={false} tickFormatter={(v) => `$${v / 1000}k`} />
                 <Tooltip />
                 <Area type="monotone" dataKey="revenue" stroke="#FF4FA3" strokeWidth={3} fill="#FFD8EA" fillOpacity={0.4} />
               </AreaChart>

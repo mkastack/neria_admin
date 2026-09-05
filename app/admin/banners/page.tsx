@@ -7,7 +7,7 @@ import { Image as ImageIcon, Plus, Eye, CheckCircle2 } from 'lucide-react';
 
 export default function BannersPage() {
   const { addToast } = useAdmin();
-  const [topBannerText, setTopBannerText] = useState('FREE SAME-DAY ACCRA DELIVERY ON ORDERS OVER GH₵ 500 ♡');
+  const [topBannerText, setTopBannerText] = useState('FREE US SHIPPING ON ORDERS OVER $500 ♡');
   const [heroHeading, setHeroHeading] = useState('Dreamy Silhouettes & Soft Girl Aesthetics');
 
   const handleSave = () => {

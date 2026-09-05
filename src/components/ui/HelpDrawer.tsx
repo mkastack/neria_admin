@@ -56,7 +56,7 @@ export function HelpDrawer() {
           <div className="space-y-2.5">
             <div className="p-3 rounded-xl border border-[#F2F3F5] bg-white hover:border-[#FFD8EA] transition-colors">
               <h5 className="text-sm font-semibold text-[#263550]">How to fulfill MoMo & Card orders</h5>
-              <p className="text-xs text-[#667085] mt-1">Navigate to Commerce &gt; Orders, select the order, pick the packed items and assign an Accra/Kumasi dispatch rider.</p>
+              <p className="text-xs text-[#667085] mt-1">Navigate to Commerce &gt; Orders, select the order, pick the packed items and assign a US courier (USPS, UPS, or FedEx).</p>
             </div>
             <div className="p-3 rounded-xl border border-[#F2F3F5] bg-white hover:border-[#FFD8EA] transition-colors">
               <h5 className="text-sm font-semibold text-[#263550]">Restocking low inventory</h5>

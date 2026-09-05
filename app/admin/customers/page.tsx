@@ -11,18 +11,22 @@ import {
   Plus, Mail, Phone, ArrowRight, Eye, Tag
 } from 'lucide-react';
 import { Customer } from '@/src/lib/types';
+import { createStaffAccount } from '@/src/lib/firebase/auth';
+import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { db } from '@/src/lib/firebase/client';
 
 export default function CustomersPage() {
-  const { customers, setCustomers, addToast } = useAdmin();
+  const { customers, addToast } = useAdmin();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSegment, setSelectedSegment] = useState<string>('All');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // New Customer Form
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [city, setCity] = useState('Accra');
+  const [city, setCity] = useState('New York');
 
   const segments = ['All', 'VIP', 'Returning', 'New', 'At Risk'];
 
@@ -43,39 +47,65 @@ export default function CustomersPage() {
   const returningCount = customers.filter(c => c.segment === 'Returning').length;
   const avgSpend = Math.round(customers.reduce((acc, c) => acc + c.totalSpent, 0) / (customers.length || 1));
 
-  const handleAddCustomer = (e: React.FormEvent) => {
+  const handleAddCustomer = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim()) return;
-
-    const newCust: Customer = {
-      id: `cust-${Date.now()}`,
-      name,
-      email: email || 'customer@neriacollective.com',
-      phone: phone || '+233 24 000 0000',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80',
-      ordersCount: 0,
-      totalSpent: 0,
-      lastOrderDate: new Date().toISOString(),
-      segment: 'New',
-      address: 'East Legon',
-      city,
-      region: 'Greater Accra',
-      notes: [],
-      tags: ['New Customer'],
-      joinedDate: new Date().toISOString(),
-      wishlistCount: 0
-    };
-
-    setCustomers([newCust, ...customers]);
-    setIsAddModalOpen(false);
-    setName('');
-    setEmail('');
-    setPhone('');
-    addToast({
-      type: 'success',
-      title: 'Customer Added ♡',
-      description: `${name} has been enrolled into Neria VIP records.`
-    });
+    if (!name.trim() || !email.trim()) {
+      addToast({
+        type: 'error',
+        title: 'Name and email required',
+        description: 'A customer needs at least a name and an email.',
+      });
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      // Create the auth account (this fires the onUserCreate Cloud
+      // Function which seeds the users/{uid} doc with name + email).
+      // We then patch in the phone + city.
+      const { user } = await createStaffAccount(email.trim(), `neria-${Date.now()}`);
+      // The customer isn't a staff account — clear any role claim that
+      // onUserCreate might have set, and add the profile fields the
+      // admin UI cares about.
+      const { getAuth } = await import('firebase/auth');
+      // We can't unset custom claims from the client, but the onUserCreate
+      // function only sets claims for the `role` field on the user doc.
+      // Since this user is a customer (no role), nothing else needs doing.
+      const [firstName, ...rest] = name.trim().split(' ');
+      const lastName = rest.join(' ');
+      await setDoc(
+        doc(db, 'users', user.uid),
+        {
+          name: name.trim(),
+          firstName,
+          lastName,
+          phone: phone || '',
+          city,
+          country: 'United States',
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true },
+      );
+      addToast({
+        type: 'success',
+        title: 'Customer Added ♡',
+        description: `${name} now has an account and can sign in.`,
+      });
+      setIsAddModalOpen(false);
+      setName('');
+      setEmail('');
+      setPhone('');
+    } catch (err: any) {
+      addToast({
+        type: 'error',
+        title: 'Could not create customer',
+        description:
+          err instanceof Error
+            ? err.message
+            : 'Please check the email is unique and try again.',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -126,7 +156,7 @@ export default function CustomersPage() {
         />
         <StatCard
           title="Average Lifetime Value"
-          value={`GH₵ ${avgSpend.toLocaleString()}`}
+          value={`$ ${avgSpend.toLocaleString()}`}
           change="+8.4% AOV"
           isPositive={true}
           theme="white"
@@ -212,7 +242,7 @@ export default function CustomersPage() {
                     {cust.ordersCount} orders
                   </td>
                   <td className="py-3.5 px-3 font-bold text-[#FF4FA3]">
-                    GH₵ {cust.totalSpent.toLocaleString()}
+                    $ {cust.totalSpent.toLocaleString()}
                   </td>
                   <td className="py-3.5 px-4 text-right">
                     <Link
@@ -267,7 +297,7 @@ export default function CustomersPage() {
                 type="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                placeholder="+233 24..."
+                placeholder="+1 (212) 555-0100"
                 className="w-full px-3.5 py-2 rounded-xl border border-[#DDE1E7] text-sm text-[#263550] outline-none"
               />
             </div>
@@ -279,7 +309,7 @@ export default function CustomersPage() {
               type="text"
               value={city}
               onChange={(e) => setCity(e.target.value)}
-              placeholder="Accra, Greater Accra"
+              placeholder="New York, NY"
               className="w-full px-3.5 py-2 rounded-xl border border-[#DDE1E7] text-sm text-[#263550] outline-none"
             />
           </div>

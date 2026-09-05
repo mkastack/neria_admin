@@ -101,7 +101,7 @@ export default function InventoryPage() {
         />
         <StatCard
           title="Total Stock Valuation"
-          value={`GH₵ ${totalValuation.toLocaleString()}`}
+          value={`$ ${totalValuation.toLocaleString()}`}
           change="Retail Value"
           isPositive={true}
           theme="blue"
@@ -223,7 +223,7 @@ export default function InventoryPage() {
                     />
                   </td>
                   <td className="py-3.5 px-3 font-semibold text-[#263550]">
-                    GH₵ {(p.stock * p.price).toLocaleString()}
+                    $ {(p.stock * p.price).toLocaleString()}
                   </td>
                   <td className="py-3.5 px-4 text-right">
                     <button

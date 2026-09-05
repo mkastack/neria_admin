@@ -3,19 +3,19 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useStorefrontCms } from '@/src/lib/context/StorefrontCmsContext';
-import { StorefrontRenderer } from '@/src/components/storefront/StorefrontRenderer';
+import { IframeStorefrontCanvas } from '@/src/components/editor/IframeStorefrontCanvas';
 import {
-  Monitor, Tablet, Smartphone, Sparkles, ArrowLeft, Globe, Eye
+  Monitor, Tablet, Smartphone, ArrowLeft
 } from 'lucide-react';
 
 export default function StandaloneStorefrontPreviewPage() {
-  const { publishedConfig, isDirty } = useStorefrontCms();
+  const { publishedConfig } = useStorefrontCms();
   const [device, setDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
 
   const containerClass = {
-    desktop: 'w-full',
-    tablet: 'w-[768px] max-w-full my-6 rounded-3xl shadow-2xl border-8 border-[#263550] overflow-hidden',
-    mobile: 'w-[390px] max-w-full my-6 rounded-[40px] shadow-2xl border-10 border-[#263550] overflow-hidden ring-4 ring-black/10'
+    desktop: 'w-full h-[calc(100vh-3rem)]',
+    tablet: 'w-[768px] max-w-full h-[calc(100vh-3rem-3rem)] my-6 rounded-3xl shadow-2xl border-8 border-[#263550] overflow-hidden',
+    mobile: 'w-[390px] max-w-full h-[calc(100vh-3rem-3rem)] my-6 rounded-[40px] shadow-2xl border-10 border-[#263550] overflow-hidden ring-4 ring-black/10'
   }[device];
 
   return (
@@ -63,10 +63,10 @@ export default function StandaloneStorefrontPreviewPage() {
         </div>
       </div>
 
-      {/* Center Storefront Canvas */}
-      <div className="flex-1 overflow-y-auto flex flex-col items-center bg-[#F8F8FA] p-0 sm:p-4">
-        <div className={`${containerClass} bg-white shadow-xl flex flex-col min-h-full`}>
-          <StorefrontRenderer isEditorMode={false} />
+      {/* Center Storefront Canvas — now the live site via iframe */}
+      <div className="flex-1 flex flex-col items-center bg-[#F8F8FA] p-0 sm:p-4">
+        <div className={`${containerClass} bg-white shadow-xl flex flex-col`}>
+          <IframeStorefrontCanvas initialPath="/" />
         </div>
       </div>
     </div>

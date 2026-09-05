@@ -46,7 +46,7 @@ export default function AdminDashboardPage() {
             </span>
           </div>
           <p className="text-sm text-[#667085] mt-1">
-            Here is what is happening with your Accra flagship and digital storefront today.
+            Here is what is happening with your New York flagship and digital storefront today.
           </p>
         </div>
 
@@ -81,7 +81,7 @@ export default function AdminDashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
         <StatCard
           title="Total Revenue"
-          value="GH₵ 48,920"
+          value="$ 48,920"
           change="+12.8%"
           isPositive={true}
           theme="pink"
@@ -121,7 +121,7 @@ export default function AdminDashboardPage() {
         />
         <StatCard
           title="Average Order"
-          value="GH₵ 445"
+          value="$ 445"
           change="+4.1%"
           isPositive={true}
           theme="cream"
@@ -131,7 +131,7 @@ export default function AdminDashboardPage() {
         />
         <StatCard
           title="Net Profit"
-          value="GH₵ 28,450"
+          value="$ 28,450"
           change="+11.5%"
           isPositive={true}
           theme="white"
@@ -184,7 +184,7 @@ export default function AdminDashboardPage() {
                   fontSize={12}
                   tickLine={false}
                   axisLine={false}
-                  tickFormatter={(val) => `GH₵${val / 1000}k`}
+                  tickFormatter={(val) => `$${val / 1000}k`}
                 />
                 <Tooltip
                   content={({ active, payload }) => {
@@ -193,9 +193,9 @@ export default function AdminDashboardPage() {
                       return (
                         <div className="bg-[#263550] text-white p-3 rounded-xl shadow-xl text-xs space-y-1">
                           <p className="font-semibold">{data.date}</p>
-                          <p className="text-[#FFD8EA]">Revenue: GH₵ {data.revenue.toLocaleString()}</p>
+                          <p className="text-[#FFD8EA]">Revenue: $ {data.revenue.toLocaleString()}</p>
                           <p className="text-[#CBE7FA]">Orders: {data.orders} orders</p>
-                          <p className="text-[#DDE1E7]">Avg Order: GH₵ {data.aov}</p>
+                          <p className="text-[#DDE1E7]">Avg Order: $ {data.aov}</p>
                         </div>
                       );
                     }
@@ -217,7 +217,7 @@ export default function AdminDashboardPage() {
           <div className="grid grid-cols-3 gap-4 pt-4 border-t border-[#F2F3F5] text-center mt-4">
             <div>
               <p className="text-xs text-[#98A0AE]">Period Earnings</p>
-              <p className="text-base font-bold text-[#263550]">GH₵ 48,920</p>
+              <p className="text-base font-bold text-[#263550]">$ 48,920</p>
             </div>
             <div>
               <p className="text-xs text-[#98A0AE]">Completed Orders</p>
@@ -225,7 +225,7 @@ export default function AdminDashboardPage() {
             </div>
             <div>
               <p className="text-xs text-[#98A0AE]">Average Order Value</p>
-              <p className="text-base font-bold text-[#263550]">GH₵ 445.00</p>
+              <p className="text-base font-bold text-[#263550]">$ 445.00</p>
             </div>
           </div>
         </div>
@@ -272,7 +272,7 @@ export default function AdminDashboardPage() {
                 </div>
                 <div className="flex items-center gap-3 text-[#667085]">
                   <span>{item.value}%</span>
-                  <span className="font-semibold text-[#263550]">GH₵ {item.revenue.toLocaleString()}</span>
+                  <span className="font-semibold text-[#263550]">$ {item.revenue.toLocaleString()}</span>
                 </div>
               </div>
             ))}
@@ -341,7 +341,7 @@ export default function AdminDashboardPage() {
                       <StatusBadge status={order.fulfillmentStatus} />
                     </td>
                     <td className="py-3.5 font-bold text-[#263550]">
-                      GH₵ {order.total}
+                      $ {order.total}
                     </td>
                     <td className="py-3.5 text-right">
                       <div className="flex items-center justify-end gap-1.5">
@@ -394,11 +394,11 @@ export default function AdminDashboardPage() {
                       <h4 className="text-xs font-bold text-[#263550] group-hover:text-[#FF4FA3] transition-colors line-clamp-1">
                         {p.name}
                       </h4>
-                      <p className="text-[11px] text-[#98A0AE]">{p.salesCount} sold • GH₵ {p.price}</p>
+                      <p className="text-[11px] text-[#98A0AE]">{p.salesCount} sold • $ {p.price}</p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className="text-xs font-bold text-[#263550]">GH₵ {p.revenue.toLocaleString()}</span>
+                    <span className="text-xs font-bold text-[#263550]">$ {p.revenue.toLocaleString()}</span>
                     <p className="text-[10px] text-[#12B76A] font-semibold">In Stock ({p.stock})</p>
                   </div>
                 </div>

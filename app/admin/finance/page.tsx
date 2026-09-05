@@ -43,7 +43,7 @@ export default function FinancePage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           title="Gross Revenue"
-          value="GH₵ 48,920"
+          value="$ 48,920"
           change="+14.2%"
           isPositive={true}
           theme="pink"
@@ -51,7 +51,7 @@ export default function FinancePage() {
         />
         <StatCard
           title="Net Operating Profit"
-          value="GH₵ 28,450"
+          value="$ 28,450"
           change="58.1% Margin"
           isPositive={true}
           theme="blue"
@@ -59,7 +59,7 @@ export default function FinancePage() {
         />
         <StatCard
           title="Gateway Processing Fees"
-          value="GH₵ 720"
+          value="$ 720"
           change="1.47% Avg Fee"
           isPositive={true}
           theme="white"
@@ -67,7 +67,7 @@ export default function FinancePage() {
         />
         <StatCard
           title="Total Refunds Issued"
-          value="GH₵ 445"
+          value="$ 445"
           change="<1% of Gross Sales"
           isPositive={true}
           theme="cream"
@@ -86,7 +86,7 @@ export default function FinancePage() {
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={financeData}>
               <XAxis dataKey="date" stroke="#98A0AE" fontSize={11} tickLine={false} />
-              <YAxis stroke="#98A0AE" fontSize={11} tickLine={false} tickFormatter={(v) => `GH₵${v / 1000}k`} />
+              <YAxis stroke="#98A0AE" fontSize={11} tickLine={false} tickFormatter={(v) => `$${v / 1000}k`} />
               <Tooltip />
               <Area type="monotone" dataKey="gross" name="Gross Sales" stroke="#FF4FA3" strokeWidth={3} fill="#FFD8EA" fillOpacity={0.3} />
               <Area type="monotone" dataKey="net" name="Net Profit" stroke="#0284C7" strokeWidth={2} fill="#CBE7FA" fillOpacity={0.3} />

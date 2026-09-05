@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { useStorefrontCms } from '@/src/lib/context/StorefrontCmsContext';
-import { CheckCircle2, AlertTriangle, X, Sparkles, Globe, History, ShieldCheck, ArrowRight } from 'lucide-react';
+import { CheckCircle2, AlertTriangle, X, Sparkles, Globe, History, ShieldCheck, ArrowRight, ExternalLink } from 'lucide-react';
 import { BunnyMascot } from '../ui/BunnyMascot';
 
 export function PublishModal() {
@@ -13,7 +14,13 @@ export function PublishModal() {
   if (!isPublishModalOpen) return null;
 
   const diffs = getPendingChangesDiff();
-  const newVersion = (publishedConfig.version || 28) + 1;
+  const newVersion = (publishedConfig.version || 0) + 1;
+  // Cache-buster so the merchant's browser always re-fetches the live
+  // site after a publish — even if their other tab was already open.
+  const commerceBase = (process.env.NEXT_PUBLIC_COMMERCE_URL || '').replace(/\/$/, '');
+  const viewLiveHref = commerceBase
+    ? `${commerceBase}/?v=${newVersion}-${Date.now()}`
+    : '/admin/website';
 
   // Validation audit checks
   const warnings: string[] = [];
@@ -129,14 +136,28 @@ export function PublishModal() {
         </div>
 
         {/* Footer Actions */}
-        <div className="px-6 py-4 bg-[#F8F8FA] border-t border-[#F2F3F5] flex justify-between items-center">
-          <button
-            onClick={() => setIsPublishModalOpen(false)}
-            disabled={isSubmitting}
-            className="px-4 py-2 text-xs font-semibold text-[#667085] hover:bg-white rounded-xl transition-colors"
-          >
-            Cancel
-          </button>
+        <div className="px-6 py-4 bg-[#F8F8FA] border-t border-[#F2F3F5] flex justify-between items-center gap-2">
+          <div className="flex items-center gap-1 min-w-0">
+            <button
+              onClick={() => setIsPublishModalOpen(false)}
+              disabled={isSubmitting}
+              className="px-4 py-2 text-xs font-semibold text-[#667085] hover:bg-white rounded-xl transition-colors"
+            >
+              Cancel
+            </button>
+            {commerceBase && (
+              <a
+                href={viewLiveHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hidden sm:inline-flex items-center gap-1 px-3 py-2 text-xs font-semibold text-[#475467] hover:text-[#FF4FA3] hover:bg-white rounded-xl transition-colors"
+                title="Open the live storefront in a new tab (cache-busted)"
+              >
+                <ExternalLink className="w-3.5 h-3.5" />
+                <span>Preview live</span>
+              </a>
+            )}
+          </div>
 
           <button
             onClick={handlePublish}

@@ -33,7 +33,7 @@ function AnimatedValue({ value }: { value: string }) {
 
     const raw = match[0];                              // e.g. "48,920" or "3.8"
     const target = parseFloat(raw.replace(/,/g, '')); // 48920 or 3.8
-    const prefix = value.slice(0, match.index);        // "GH₵ "
+    const prefix = value.slice(0, match.index);        // "$"
     const suffix = value.slice(match.index + raw.length); // "%" or ""
     const hasDecimals = raw.includes('.');
     const decimals = hasDecimals ? (raw.split('.')[1]?.length ?? 1) : 0;

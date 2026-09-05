@@ -1,7 +1,7 @@
 export type OrderStatus = 'Paid' | 'Pending' | 'Failed' | 'Refunded';
 export type FulfillmentStatus = 'Unfulfilled' | 'Processing' | 'Packed' | 'Shipped' | 'Delivered' | 'Cancelled' | 'Returned';
 export type DeliveryMethod = 'Standard Delivery' | 'Express Delivery' | 'In-Store Pickup';
-export type PaymentMethod = 'MTN Mobile Money' | 'Telecel Cash' | 'Credit / Debit Card' | 'Bank Transfer' | 'Cash on Delivery';
+export type PaymentMethod = 'Stripe (Card)' | 'Stripe (Apple Pay)' | 'Stripe (Google Pay)' | 'Shop Pay' | 'PayPal' | 'Credit / Debit Card' | 'Bank Transfer';
 
 export interface OrderItem {
   id: string;
@@ -692,6 +692,34 @@ export interface StorefrontConfig {
   popup: PopupConfig;
   footer: FooterConfig;
   seo: SEOConfig;
+  /**
+   * Per-page editable text. Mirrors `PageTextConfig` in
+   * `neria_commerce/app/lib/firebase/cms.ts`. Empty by default.
+   */
+  pageText?: PageTextConfig;
   version: number;
   lastUpdated: string;
 }
+
+/**
+ * Per-page editable text. Each slot is a free-form key→string map
+ * whose keys mirror the `pg-<page>-<field>` annotation suffixes in the
+ * commerce site. The admin editor saves values here when the user
+ * clicks a `pg-*` element in the iframe and types a new value.
+ */
+export type PageTextConfig = {
+  home?: Record<string, string>;
+  nav?: Record<string, string>;
+  footer?: Record<string, string>;
+  shop?: Record<string, string>;
+  product?: Record<string, string>;
+  cart?: Record<string, string>;
+  checkout?: Record<string, string>;
+  account?: Record<string, string>;
+  trending?: Record<string, string>;
+  auth?: Record<string, string>;
+  orders?: Record<string, string>;
+  order?: Record<string, string>;
+  orderTrack?: Record<string, string>;
+  [key: string]: Record<string, string> | undefined;
+};

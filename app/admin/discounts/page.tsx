@@ -96,12 +96,12 @@ export default function DiscountsPage() {
                 {disc.type === 'Percentage'
                   ? `${disc.value}% Off Entire Store`
                   : disc.type === 'Fixed Amount'
-                  ? `GH₵ ${disc.value} Off Purchases`
+                  ? `$ ${disc.value} Off Purchases`
                   : 'Free Shipping Promo'}
               </h3>
 
               <div className="space-y-1.5 text-xs text-[#667085] mt-2">
-                {disc.minSpend ? <p>• Minimum spend: GH₵ {disc.minSpend}</p> : <p>• No minimum spend</p>}
+                {disc.minSpend ? <p>• Minimum spend: $ {disc.minSpend}</p> : <p>• No minimum spend</p>}
                 <p>• Applies to {disc.applicableTo}</p>
                 <p>• {disc.usageCount} times redeemed {disc.usageLimit ? `/ ${disc.usageLimit} max` : ''}</p>
               </div>
@@ -159,7 +159,7 @@ export default function DiscountsPage() {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-bold text-[#263550] mb-1">
-                {type === 'Percentage' ? 'Discount Percentage (%)' : 'Amount (GH₵)'}
+                {type === 'Percentage' ? 'Discount Percentage (%)' : 'Amount ($)'}
               </label>
               <input
                 type="number"
@@ -169,7 +169,7 @@ export default function DiscountsPage() {
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-[#263550] mb-1">Min Spend (GH₵)</label>
+              <label className="block text-xs font-bold text-[#263550] mb-1">Min Spend ($)</label>
               <input
                 type="number"
                 value={minSpend}
@@ -183,9 +183,9 @@ export default function DiscountsPage() {
           <div className="p-4 rounded-2xl bg-[#FFF4F8] border border-[#FFD8EA] text-center">
             <span className="text-[10px] font-bold text-[#98A0AE] uppercase tracking-wider">Preview Card</span>
             <h4 className="text-base font-extrabold text-[#263550] mt-1">
-              {code || 'YOURCODE'} — {type === 'Percentage' ? `${value}% OFF` : `GH₵ ${value} OFF`}
+              {code || 'YOURCODE'} — {type === 'Percentage' ? `${value}% OFF` : `$ ${value} OFF`}
             </h4>
-            <p className="text-xs text-[#667085] mt-0.5">Applies to all eligible items above GH₵ {minSpend}</p>
+            <p className="text-xs text-[#667085] mt-0.5">Applies to all eligible items above $ {minSpend}</p>
           </div>
 
           <div className="pt-4 border-t border-[#F2F3F5] flex items-center justify-end gap-2">

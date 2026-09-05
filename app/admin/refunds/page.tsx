@@ -32,7 +32,7 @@ export default function RefundsPage() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard
           title="Total Refunded (30 Days)"
-          value={`GH₵ ${totalRefunded.toLocaleString()}`}
+          value={`$ ${totalRefunded.toLocaleString()}`}
           change="Reversals & exchanges"
           isPositive={false}
           theme="pink"
@@ -84,7 +84,7 @@ export default function RefundsPage() {
                   <td className="py-3.5 px-3 font-semibold text-[#FF4FA3]">{ref.orderNumber}</td>
                   <td className="py-3.5 px-3 font-medium text-[#263550]">{ref.customerName}</td>
                   <td className="py-3.5 px-3 text-[#667085]">{ref.reason}</td>
-                  <td className="py-3.5 px-3 font-bold text-[#B42318]">GH₵ {ref.amount}</td>
+                  <td className="py-3.5 px-3 font-bold text-[#B42318]">$ {ref.amount}</td>
                   <td className="py-3.5 px-3">
                     <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${ref.restocked ? 'bg-[#ECFDF3] text-[#027A48]' : 'bg-[#FEF3F2] text-[#B42318]'}`}>
                       {ref.restocked ? 'Yes, Restocked' : 'No'}

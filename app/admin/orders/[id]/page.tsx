@@ -52,7 +52,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
     addToast({
       type: 'info',
       title: 'Refund Processed ♡',
-      description: `GH₵ ${refundAmount} refunded for order ${order.orderNumber}.`
+      description: `$ ${refundAmount} refunded for order ${order.orderNumber}.`
     });
   };
 
@@ -138,8 +138,8 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                   </div>
 
                   <div className="text-right shrink-0">
-                    <p className="text-sm font-bold text-[#263550]">GH₵ {item.price * item.quantity}</p>
-                    <p className="text-xs text-[#98A0AE]">GH₵ {item.price} × {item.quantity}</p>
+                    <p className="text-sm font-bold text-[#263550]">$ {item.price * item.quantity}</p>
+                    <p className="text-xs text-[#98A0AE]">$ {item.price} × {item.quantity}</p>
                   </div>
                 </div>
               ))}
@@ -149,21 +149,21 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
             <div className="mt-6 pt-5 border-t border-[#F2F3F5] space-y-2 text-xs">
               <div className="flex justify-between text-[#667085]">
                 <span>Subtotal</span>
-                <span className="font-semibold text-[#263550]">GH₵ {order.subtotal}</span>
+                <span className="font-semibold text-[#263550]">$ {order.subtotal}</span>
               </div>
               {order.discount > 0 && (
                 <div className="flex justify-between text-[#FF4FA3]">
                   <span>Discount ({order.discountCode || 'Promo'})</span>
-                  <span className="font-semibold">- GH₵ {order.discount}</span>
+                  <span className="font-semibold">- $ {order.discount}</span>
                 </div>
               )}
               <div className="flex justify-between text-[#667085]">
                 <span>Delivery & Handling ({order.deliveryMethod})</span>
-                <span className="font-semibold text-[#263550]">GH₵ {order.shippingFee}</span>
+                <span className="font-semibold text-[#263550]">$ {order.shippingFee}</span>
               </div>
               <div className="flex justify-between text-base font-bold text-[#263550] pt-3 border-t border-[#F2F3F5]">
                 <span>Total Paid</span>
-                <span className="text-[#FF4FA3]">GH₵ {order.total}</span>
+                <span className="text-[#FF4FA3]">$ {order.total}</span>
               </div>
             </div>
           </div>
@@ -313,7 +313,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
       >
         <div className="space-y-4">
           <div>
-            <label className="block text-xs font-bold text-[#263550] mb-1">Refund Amount (GH₵)</label>
+            <label className="block text-xs font-bold text-[#263550] mb-1">Refund Amount ($)</label>
             <input
               type="number"
               value={refundAmount}
@@ -352,7 +352,7 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
               onClick={handleConfirmRefund}
               className="px-5 py-2 rounded-xl bg-[#B42318] hover:bg-[#912018] text-white text-xs font-semibold cursor-pointer"
             >
-              Confirm Refund GH₵ {refundAmount}
+              Confirm Refund $ {refundAmount}
             </button>
           </div>
         </div>

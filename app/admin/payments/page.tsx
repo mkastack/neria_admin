@@ -15,43 +15,43 @@ export default function PaymentsPage() {
 
   const paymentMethods = [
     {
-      name: 'MTN Mobile Money',
+      name: 'Stripe (Card)',
       badge: 'Most Popular',
-      volume: 'GH₵ 34,200',
+      volume: '$34,200',
       transactions: 92,
       share: '70%',
-      color: '#FFCC00',
-      fee: '1.0% fee',
+      color: '#635BFF',
+      fee: '2.9% + 30¢ fee',
       status: 'Operational'
     },
     {
-      name: 'Credit / Debit Card (Visa & Mastercard)',
-      badge: 'International',
-      volume: 'GH₵ 9,800',
+      name: 'Apple Pay',
+      badge: 'Mobile Wallet',
+      volume: '$9,800',
       transactions: 24,
       share: '20%',
-      color: '#00579F',
-      fee: '2.5% fee',
+      color: '#000000',
+      fee: '2.9% + 30¢ fee',
       status: 'Operational'
     },
     {
-      name: 'Telecel Cash',
-      badge: 'Mobile Wallet',
-      volume: 'GH₵ 3,920',
+      name: 'Shop Pay',
+      badge: 'Express Checkout',
+      volume: '$3,920',
       transactions: 18,
       share: '8%',
-      color: '#E60000',
-      fee: '1.0% fee',
+      color: '#5A31F4',
+      fee: '2.9% + 30¢ fee',
       status: 'Operational'
     },
     {
-      name: 'Bank Direct Transfer',
+      name: 'PayPal',
       badge: 'Manual Approval',
-      volume: 'GH₵ 1,000',
+      volume: '$1,000',
       transactions: 8,
       share: '2%',
-      color: '#263550',
-      fee: '0% fee',
+      color: '#003087',
+      fee: '3.5% fee',
       status: 'Operational'
     }
   ];
@@ -63,7 +63,7 @@ export default function PaymentsPage() {
         <div>
           <h1 className="text-2xl font-bold text-[#263550]">Payments & Gateways</h1>
           <p className="text-xs text-[#667085] mt-0.5">
-            Monitor mobile money settlements, card processor volume, and payment channels.
+            Monitor card settlements, mobile wallet volume, and payment channels.
           </p>
         </div>
 
@@ -80,7 +80,7 @@ export default function PaymentsPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           title="Gross Payments Today"
-          value="GH₵ 48,920"
+          value="$48,920"
           change="+12.8%"
           isPositive={true}
           theme="pink"
@@ -96,7 +96,7 @@ export default function PaymentsPage() {
         />
         <StatCard
           title="Pending Settlements"
-          value="GH₵ 4,200"
+          value="$4,200"
           change="Releasing 6 PM"
           isPositive={true}
           theme="cream"
@@ -104,8 +104,8 @@ export default function PaymentsPage() {
         />
         <StatCard
           title="Merchant Balance"
-          value="GH₵ 18,450"
-          change="Stanbic Bank linked"
+          value="$18,450"
+          change="Chase Bank linked"
           isPositive={true}
           theme="blue"
           icon={<Wallet className="w-5 h-5" />}

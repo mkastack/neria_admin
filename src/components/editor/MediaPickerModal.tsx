@@ -1,29 +1,34 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useStorefrontCms } from '@/src/lib/context/StorefrontCmsContext';
-import { X, Search, UploadCloud, Check, Image as ImageIcon, Folder, Trash2 } from 'lucide-react';
+import { X, Search, UploadCloud, Check, Image as ImageIcon, Loader2 } from 'lucide-react';
+import { uploadMedia } from '@/src/lib/firebase/media';
 
 export function MediaPickerModal() {
-  const { isMediaPickerOpen, setIsMediaPickerOpen, mediaPickerTarget, mediaAssets, addMediaAsset } = useStorefrontCms();
+  const { isMediaPickerOpen, setIsMediaPickerOpen, mediaPickerTarget, mediaAssets } = useStorefrontCms();
   const [search, setSearch] = useState('');
   const [selectedFolder, setSelectedFolder] = useState('All');
   const [selectedAssetUrl, setSelectedAssetUrl] = useState<string>('');
   const [selectedAssetAlt, setSelectedAssetAlt] = useState<string>('');
 
-  // Mock Upload state
-  const [uploadUrl, setUploadUrl] = useState('');
+  // Real upload state
+  const [stagedFile, setStagedFile] = useState<File | null>(null);
   const [uploadName, setUploadName] = useState('');
+  const [uploadAlt, setUploadAlt] = useState('');
   const [uploadFolder, setUploadFolder] = useState('Campaigns');
   const [showUploadForm, setShowUploadForm] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!isMediaPickerOpen) return null;
 
-  const folders = ['All', 'Campaigns', 'Categories', 'Marketing', 'Products'];
+  const folders = ['All', 'Campaigns', 'Categories', 'Marketing', 'Products', 'Uploads'];
 
   const filteredAssets = mediaAssets.filter(asset => {
     const matchesFolder = selectedFolder === 'All' || asset.folder === selectedFolder;
-    const matchesSearch = asset.name.toLowerCase().includes(search.toLowerCase()) || asset.altText.toLowerCase().includes(search.toLowerCase());
+    const q = search.toLowerCase().trim();
+    const matchesSearch = !q || asset.name.toLowerCase().includes(q) || asset.altText.toLowerCase().includes(q);
     return matchesFolder && matchesSearch;
   });
 
@@ -34,24 +39,30 @@ export function MediaPickerModal() {
     setIsMediaPickerOpen(false);
   };
 
-  const handleUploadSubmit = (e: React.FormEvent) => {
+  const handleUploadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!uploadUrl) return;
-    addMediaAsset({
-      name: uploadName || `media_upload_${Date.now()}.jpg`,
-      url: uploadUrl,
-      type: 'campaign',
-      sizeBytes: 850000,
-      width: 1400,
-      height: 1000,
-      folder: uploadFolder,
-      altText: uploadName || 'Neria Media Asset'
-    });
-    setSelectedAssetUrl(uploadUrl);
-    setSelectedAssetAlt(uploadName || 'Neria Media Asset');
-    setUploadUrl('');
-    setUploadName('');
-    setShowUploadForm(false);
+    if (!stagedFile) return;
+    setIsUploading(true);
+    try {
+      const asset = await uploadMedia({
+        file: stagedFile,
+        name: uploadName.trim() || stagedFile.name,
+        altText: uploadAlt.trim() || uploadName.trim() || 'Neria Media Asset',
+        folder: uploadFolder,
+        type: 'image',
+      });
+      setSelectedAssetUrl(asset.url);
+      setSelectedAssetAlt(asset.altText);
+      setStagedFile(null);
+      setUploadName('');
+      setUploadAlt('');
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      setShowUploadForm(false);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Upload failed. Please try again.');
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   return (
@@ -103,24 +114,48 @@ export function MediaPickerModal() {
 
                 <div className="space-y-3 text-left">
                   <div>
-                    <label className="block text-xs font-semibold text-[#263550] mb-1">Image URL / Unsplash Link</label>
+                    <label className="block text-xs font-semibold text-[#263550] mb-1">Image File</label>
                     <input
-                      type="url"
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
                       required
-                      placeholder="https://images.unsplash.com/..."
-                      value={uploadUrl}
-                      onChange={e => setUploadUrl(e.target.value)}
-                      className="w-full px-3 py-2 text-xs rounded-xl bg-white border border-[#DDE1E7] focus:outline-none focus:border-[#FF4FA3]"
+                      onChange={(e) => {
+                        const f = e.target.files?.[0];
+                        if (f) {
+                          setStagedFile(f);
+                          if (!uploadName) setUploadName(f.name.replace(/\.[^.]+$/, ''));
+                        }
+                      }}
+                      disabled={isUploading}
+                      className="block w-full text-xs text-[#263550] file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-[#FFF4F8] file:text-[#FF4FA3] file:font-bold file:cursor-pointer hover:file:bg-[#FFD8EA] disabled:opacity-50"
                     />
+                    {stagedFile && (
+                      <p className="mt-1 text-[10px] text-[#98A0AE]">
+                        {stagedFile.name} · {(stagedFile.size / 1024 / 1024).toFixed(2)} MB
+                      </p>
+                    )}
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-[#263550] mb-1">Asset Title / Alt Text</label>
+                    <label className="block text-xs font-semibold text-[#263550] mb-1">Asset Name</label>
                     <input
                       type="text"
                       placeholder="e.g. Summer Lookbook Model Sunset"
                       value={uploadName}
                       onChange={e => setUploadName(e.target.value)}
-                      className="w-full px-3 py-2 text-xs rounded-xl bg-white border border-[#DDE1E7] focus:outline-none focus:border-[#FF4FA3]"
+                      disabled={isUploading}
+                      className="w-full px-3 py-2 text-xs rounded-xl bg-white border border-[#DDE1E7] focus:outline-none focus:border-[#FF4FA3] disabled:opacity-50"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-[#263550] mb-1">Alt Text (for accessibility)</label>
+                    <input
+                      type="text"
+                      placeholder="Briefly describe the image"
+                      value={uploadAlt}
+                      onChange={e => setUploadAlt(e.target.value)}
+                      disabled={isUploading}
+                      className="w-full px-3 py-2 text-xs rounded-xl bg-white border border-[#DDE1E7] focus:outline-none focus:border-[#FF4FA3] disabled:opacity-50"
                     />
                   </div>
                   <div>
@@ -128,21 +163,31 @@ export function MediaPickerModal() {
                     <select
                       value={uploadFolder}
                       onChange={e => setUploadFolder(e.target.value)}
-                      className="w-full px-3 py-2 text-xs rounded-xl bg-white border border-[#DDE1E7] focus:outline-none focus:border-[#FF4FA3]"
+                      disabled={isUploading}
+                      className="w-full px-3 py-2 text-xs rounded-xl bg-white border border-[#DDE1E7] focus:outline-none focus:border-[#FF4FA3] disabled:opacity-50"
                     >
                       <option value="Campaigns">Campaigns</option>
                       <option value="Categories">Categories</option>
                       <option value="Marketing">Marketing</option>
                       <option value="Products">Products</option>
+                      <option value="Uploads">Uploads</option>
                     </select>
                   </div>
                 </div>
 
                 <button
                   type="submit"
-                  className="mt-5 w-full py-2.5 rounded-xl bg-[#FF4FA3] text-white font-bold text-xs shadow-xs hover:bg-[#E63E90] transition-colors"
+                  disabled={!stagedFile || isUploading}
+                  className="mt-5 w-full py-2.5 rounded-xl bg-[#FF4FA3] text-white font-bold text-xs shadow-xs hover:bg-[#E63E90] transition-colors disabled:opacity-50 inline-flex items-center justify-center gap-1.5"
                 >
-                  Save & Insert into Section
+                  {isUploading ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      Uploading...
+                    </>
+                  ) : (
+                    'Save & Insert into Section'
+                  )}
                 </button>
               </div>
             </form>

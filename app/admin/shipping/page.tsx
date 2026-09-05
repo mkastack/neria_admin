@@ -19,21 +19,21 @@ export default function ShippingPage() {
   const shippingMethods = [
     {
       title: 'Standard Dispatch',
-      desc: 'Same-day or next-day courier delivery within Greater Accra and regional capitals.',
-      rate: 'From GH₵ 25',
+      desc: 'Standard ground delivery anywhere in the continental United States.',
+      rate: 'From $ 25',
       time: '24 - 48 Hours',
       badge: 'Default Method'
     },
     {
       title: 'VIP Express Courier',
       desc: 'Priority immediate motorcycle dispatch with direct doorstep handover.',
-      rate: 'From GH₵ 40',
+      rate: 'From $ 40',
       time: '2 - 4 Hours',
       badge: 'Fastest'
     },
     {
       title: 'Showroom Boutique Pickup',
-      desc: 'Pick up orders directly from Neria flagship showroom in East Legon.',
+      desc: 'Pick up orders directly from the Neria flagship showroom in New York.',
       rate: 'Free',
       time: 'Ready in 1 Hour',
       badge: 'Free'
@@ -145,8 +145,8 @@ export default function ShippingPage() {
                       ))}
                     </div>
                   </td>
-                  <td className="py-3.5 px-3 font-bold text-[#263550]">GH₵ {zone.standardRate}</td>
-                  <td className="py-3.5 px-3 font-bold text-[#FF4FA3]">GH₵ {zone.expressRate}</td>
+                  <td className="py-3.5 px-3 font-bold text-[#263550]">$ {zone.standardRate}</td>
+                  <td className="py-3.5 px-3 font-bold text-[#FF4FA3]">$ {zone.expressRate}</td>
                   <td className="py-3.5 px-3 text-[#667085]">{zone.estimatedDelivery}</td>
                   <td className="py-3.5 px-3">
                     <StatusBadge status={zone.status} />
@@ -173,7 +173,7 @@ export default function ShippingPage() {
               required
               value={zoneName}
               onChange={(e) => setZoneName(e.target.value)}
-              placeholder="e.g. Western Region (Takoradi)"
+              placeholder="e.g. West Coast (California)"
               className="w-full px-3.5 py-2 rounded-xl border border-[#DDE1E7] text-sm text-[#263550] outline-none"
             />
           </div>
@@ -184,14 +184,14 @@ export default function ShippingPage() {
               type="text"
               value={regions}
               onChange={(e) => setRegions(e.target.value)}
-              placeholder="e.g. Takoradi Central, Effia Nkwanta, Beach Road"
+              placeholder="e.g. Downtown LA, Santa Monica, Venice Beach"
               className="w-full px-3.5 py-2 rounded-xl border border-[#DDE1E7] text-xs text-[#263550] outline-none"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-bold text-[#263550] mb-1">Standard Rate (GH₵)</label>
+              <label className="block text-xs font-bold text-[#263550] mb-1">Standard Rate ($)</label>
               <input
                 type="number"
                 value={stdRate}
@@ -200,7 +200,7 @@ export default function ShippingPage() {
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-[#263550] mb-1">Express Rate (GH₵)</label>
+              <label className="block text-xs font-bold text-[#263550] mb-1">Express Rate ($)</label>
               <input
                 type="number"
                 value={expRate}

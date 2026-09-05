@@ -92,7 +92,7 @@ export default function ReturnsPage() {
                   </td>
                   <td className="py-3.5 px-3 text-[#667085]">{ret.items.join(', ')}</td>
                   <td className="py-3.5 px-3 text-[#667085]">{ret.reason}</td>
-                  <td className="py-3.5 px-3 font-bold text-[#263550]">GH₵ {ret.refundAmount}</td>
+                  <td className="py-3.5 px-3 font-bold text-[#263550]">$ {ret.refundAmount}</td>
                   <td className="py-3.5 px-3">
                     <StatusBadge status={ret.status} />
                   </td>
@@ -137,7 +137,7 @@ export default function ReturnsPage() {
               </div>
               <div className="flex justify-between py-2 border-b border-[#F2F3F5]">
                 <span className="text-[#667085]">Refund Value</span>
-                <span className="font-bold text-[#FF4FA3]">GH₵ {selectedReturn.refundAmount}</span>
+                <span className="font-bold text-[#FF4FA3]">$ {selectedReturn.refundAmount}</span>
               </div>
               {selectedReturn.adminNotes && (
                 <div className="py-2 border-b border-[#F2F3F5]">
