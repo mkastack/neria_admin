@@ -2,6 +2,7 @@
 
 import {
   collection,
+  deleteDoc,
   doc,
   onSnapshot,
   orderBy,
@@ -61,3 +62,9 @@ export async function upsertPromoCode(d: Discount): Promise<void> {
     { merge: true },
   );
 }
+
+export async function deletePromoCode(code: string): Promise<void> {
+  const id = code.toUpperCase();
+  await deleteDoc(doc(db, "promoCodes", id));
+}
+

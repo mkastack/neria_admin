@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useAdmin } from '@/src/lib/context/AdminContext';
 import { StatusBadge } from '@/src/components/ui/StatusBadge';
@@ -12,21 +12,83 @@ import {
 import { Transaction } from '@/src/lib/types';
 
 export default function TransactionsPage() {
-  const { transactions, addToast } = useAdmin();
+  const { orders, addToast } = useAdmin();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTx, setSelectedTx] = useState<Transaction | null>(null);
 
-  const filteredTx = transactions.filter((t) =>
-    t.transactionNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    t.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    t.customerName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Derive real-time transactions from live Firestore orders
+  const transactions: Transaction[] = useMemo(() => {
+    return orders.map((ord) => {
+      const fee = Math.round(ord.total * 0.029 * 100) / 100;
+      const isRefunded = ord.paymentStatus === 'Refunded';
+      const isFailed = ord.paymentStatus === 'Failed';
+      const isPending = ord.paymentStatus === 'Pending';
+
+      return {
+        id: `tx-${ord.id}`,
+        transactionNumber: `TXN-${ord.orderNumber.replace(/[^0-9]/g, '') || ord.id.slice(0, 6)}`,
+        orderNumber: ord.orderNumber,
+        customerName: ord.customer?.name || 'Customer',
+        method: (ord.paymentMethod as any) || 'Paystack',
+        type: isRefunded ? 'Refund' : 'Charge',
+        amount: ord.total,
+        fee: fee,
+        net: Math.round((ord.total - fee) * 100) / 100,
+        status: isFailed ? 'Failed' : (isPending ? 'Pending' : 'Success'),
+        reference: `ch_${ord.id.slice(0, 12)}`,
+        date: ord.createdAt || new Date().toISOString(),
+      };
+    });
+  }, [orders]);
+
+  const filteredTx = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim();
+    if (!q) return transactions;
+    return transactions.filter((t) =>
+      t.transactionNumber.toLowerCase().includes(q) ||
+      t.orderNumber.toLowerCase().includes(q) ||
+      t.customerName.toLowerCase().includes(q) ||
+      t.method.toLowerCase().includes(q)
+    );
+  }, [transactions, searchQuery]);
 
   const handleExport = () => {
+    if (filteredTx.length === 0) {
+      addToast({
+        type: 'info',
+        title: 'No Data to Export',
+        description: 'No transactions found.'
+      });
+      return;
+    }
+
+    const headers = ['Transaction ID', 'Order Number', 'Customer', 'Method', 'Type', 'Gross', 'Fee', 'Net', 'Status', 'Date'];
+    const rows = filteredTx.map((t) => [
+      t.transactionNumber,
+      t.orderNumber,
+      `"${t.customerName.replace(/"/g, '""')}"`,
+      t.method,
+      t.type,
+      t.amount,
+      t.fee,
+      t.net,
+      t.status,
+      t.date
+    ]);
+    const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `neria_transactions_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
     addToast({
-      type: 'info',
+      type: 'success',
       title: 'Transactions Exported',
-      description: 'Audit log exported as CSV.'
+      description: `${filteredTx.length} live transactions exported to CSV.`
     });
   };
 
@@ -37,7 +99,7 @@ export default function TransactionsPage() {
         <div>
           <h1 className="text-2xl font-bold text-[#263550]">Financial Transactions</h1>
           <p className="text-xs text-[#667085] mt-0.5">
-            Complete audit trail of all charges, fee withholdings, refunds, and adjustments.
+            Real-time audit trail of all customer charges, fee withholdings, and settlement records.
           </p>
         </div>
 
@@ -76,43 +138,51 @@ export default function TransactionsPage() {
                 <th className="py-4 px-3">Method</th>
                 <th className="py-4 px-3">Type</th>
                 <th className="py-4 px-3">Gross</th>
-                <th className="py-4 px-3">Fee</th>
+                <th className="py-4 px-3">Fee (2.9%)</th>
                 <th className="py-4 px-3">Net Amount</th>
                 <th className="py-4 px-3">Status</th>
                 <th className="py-4 px-4 text-right">Date</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#F2F3F5] text-xs">
-              {filteredTx.map((tx) => (
-                <tr
-                  key={tx.id}
-                  onClick={() => setSelectedTx(tx)}
-                  className="hover:bg-[#FFF4F8]/40 transition-colors cursor-pointer group"
-                >
-                  <td className="py-3.5 px-4 font-mono font-bold text-[#263550] group-hover:text-[#FF4FA3]">
-                    {tx.transactionNumber}
-                  </td>
-                  <td className="py-3.5 px-3 font-semibold text-[#263550]">{tx.orderNumber}</td>
-                  <td className="py-3.5 px-3 text-[#263550] font-medium">{tx.customerName}</td>
-                  <td className="py-3.5 px-3 text-[#667085]">{tx.method}</td>
-                  <td className="py-3.5 px-3">
-                    <span className={`px-2 py-0.5 rounded-md text-[11px] font-bold ${
-                      tx.type === 'Charge' ? 'bg-[#ECFDF3] text-[#027A48]' : 'bg-[#FEF3F2] text-[#B42318]'
-                    }`}>
-                      {tx.type}
-                    </span>
-                  </td>
-                  <td className="py-3.5 px-3 font-bold text-[#263550]">$ {tx.amount}</td>
-                  <td className="py-3.5 px-3 text-[#98A0AE]">$ {tx.fee}</td>
-                  <td className="py-3.5 px-3 font-bold text-[#FF4FA3]">$ {tx.net}</td>
-                  <td className="py-3.5 px-3">
-                    <StatusBadge status={tx.status} />
-                  </td>
-                  <td className="py-3.5 px-4 text-right text-[#98A0AE]">
-                    {new Date(tx.date).toLocaleDateString()}
+              {filteredTx.length === 0 ? (
+                <tr>
+                  <td colSpan={10} className="py-8 text-center text-xs text-[#98A0AE]">
+                    No transactions found matching your criteria.
                   </td>
                 </tr>
-              ))}
+              ) : (
+                filteredTx.map((tx) => (
+                  <tr
+                    key={tx.id}
+                    onClick={() => setSelectedTx(tx)}
+                    className="hover:bg-[#FFF4F8]/40 transition-colors cursor-pointer group"
+                  >
+                    <td className="py-3.5 px-4 font-mono font-bold text-[#263550] group-hover:text-[#FF4FA3]">
+                      {tx.transactionNumber}
+                    </td>
+                    <td className="py-3.5 px-3 font-semibold text-[#263550]">{tx.orderNumber}</td>
+                    <td className="py-3.5 px-3 text-[#263550] font-medium">{tx.customerName}</td>
+                    <td className="py-3.5 px-3 text-[#667085]">{tx.method}</td>
+                    <td className="py-3.5 px-3">
+                      <span className={`px-2 py-0.5 rounded-md text-[11px] font-bold ${
+                        tx.type === 'Charge' ? 'bg-[#ECFDF3] text-[#027A48]' : 'bg-[#FEF3F2] text-[#B42318]'
+                      }`}>
+                        {tx.type}
+                      </span>
+                    </td>
+                    <td className="py-3.5 px-3 font-bold text-[#263550]">$ {tx.amount.toLocaleString()}</td>
+                    <td className="py-3.5 px-3 text-[#98A0AE]">$ {tx.fee.toLocaleString()}</td>
+                    <td className="py-3.5 px-3 font-bold text-[#FF4FA3]">$ {tx.net.toLocaleString()}</td>
+                    <td className="py-3.5 px-3">
+                      <StatusBadge status={tx.status} />
+                    </td>
+                    <td className="py-3.5 px-4 text-right text-[#98A0AE]">
+                      {new Date(tx.date).toLocaleDateString()}
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
@@ -129,7 +199,7 @@ export default function TransactionsPage() {
           <div className="space-y-6">
             <div className="p-4 rounded-2xl bg-[#FFF4F8] border border-[#FFD8EA] text-center">
               <span className="text-[11px] font-bold text-[#98A0AE] uppercase">Net Settlement Amount</span>
-              <h2 className="text-2xl font-extrabold text-[#263550] mt-1">$ {selectedTx.net}</h2>
+              <h2 className="text-2xl font-extrabold text-[#263550] mt-1">$ {selectedTx.net.toLocaleString()}</h2>
               <span className="inline-block mt-1">
                 <StatusBadge status={selectedTx.status} />
               </span>
@@ -155,12 +225,12 @@ export default function TransactionsPage() {
 
               <div className="flex justify-between py-2 border-b border-[#F2F3F5]">
                 <span className="text-[#667085]">Gross Amount</span>
-                <span className="font-bold text-[#263550]">$ {selectedTx.amount}</span>
+                <span className="font-bold text-[#263550]">$ {selectedTx.amount.toLocaleString()}</span>
               </div>
 
               <div className="flex justify-between py-2 border-b border-[#F2F3F5]">
-                <span className="text-[#667085]">Gateway Processing Fee</span>
-                <span className="text-[#B42318] font-bold">- $ {selectedTx.fee}</span>
+                <span className="text-[#667085]">Gateway Processing Fee (2.9%)</span>
+                <span className="text-[#B42318] font-bold">- $ {selectedTx.fee.toLocaleString()}</span>
               </div>
 
               <div className="flex justify-between py-2 border-b border-[#F2F3F5]">

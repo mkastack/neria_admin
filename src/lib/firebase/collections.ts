@@ -2,6 +2,7 @@
 
 import {
   collection,
+  deleteDoc,
   doc,
   onSnapshot,
   orderBy,
@@ -58,3 +59,8 @@ export async function upsertCollection(c: Collection): Promise<void> {
     { merge: true },
   );
 }
+
+export async function deleteCollection(id: string): Promise<void> {
+  await deleteDoc(doc(db, "collections", id));
+}
+

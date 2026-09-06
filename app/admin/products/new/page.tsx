@@ -1,20 +1,23 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAdmin } from '@/src/lib/context/AdminContext';
 import {
   ChevronLeft, UploadCloud, Plus, Trash2, Check,
   Sparkles, DollarSign, Boxes, Layers, Image as ImageIcon,
-  Tag, Eye, Save
+  Tag, Eye, Save, Loader2
 } from 'lucide-react';
 import { Product, ProductVariant } from '@/src/lib/types';
 import { createProduct } from '@/src/lib/firebase/products';
+import { uploadMedia } from '@/src/lib/firebase/media';
 
 export default function AddProductPage() {
   const router = useRouter();
   const { addToast } = useAdmin();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   // Form State
   const [name, setName] = useState('');
@@ -71,6 +74,51 @@ export default function AddProductPage() {
       stock: 10
     }))
   );
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setIsUploading(true);
+    let uploadedCount = 0;
+
+    try {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        if (!file.type.startsWith('image/')) continue;
+
+        const asset = await uploadMedia({
+          file,
+          name: file.name,
+          altText: name || file.name,
+          folder: 'Products',
+          type: 'image'
+        });
+
+        if (asset?.url) {
+          setImages(prev => [...prev, asset.url]);
+          uploadedCount++;
+        }
+      }
+
+      if (uploadedCount > 0) {
+        addToast({
+          type: 'success',
+          title: 'Media Uploaded ♡',
+          description: `${uploadedCount} product image${uploadedCount > 1 ? 's' : ''} uploaded to cloud storage.`
+        });
+      }
+    } catch (err) {
+      addToast({
+        type: 'error',
+        title: 'Upload Failed',
+        description: err instanceof Error ? err.message : 'Could not upload image to storage.'
+      });
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
 
   const handleAddImage = () => {
     if (!newImageUrl.trim()) return;
@@ -260,29 +308,54 @@ export default function AddProductPage() {
                 </div>
               ))}
 
-              {/* Add image URL tile */}
-              <div className="aspect-square rounded-2xl border-2 border-dashed border-[#DDE1E7] hover:border-[#FFD8EA] flex flex-col items-center justify-center p-3 text-center transition-colors">
-                <UploadCloud className="w-6 h-6 text-[#FF4FA3] mb-1" />
-                <span className="text-[11px] font-semibold text-[#263550]">Add Media</span>
-                <span className="text-[9px] text-[#98A0AE]">PNG, JPG, WebP</span>
-              </div>
+              {/* Add image file upload tile */}
+              <button
+                type="button"
+                disabled={isUploading}
+                onClick={() => fileInputRef.current?.click()}
+                className="aspect-square rounded-2xl border-2 border-dashed border-[#FF80BF] hover:border-[#FF4FA3] hover:bg-[#FFF4F8]/50 flex flex-col items-center justify-center p-3 text-center transition-all cursor-pointer group disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {isUploading ? (
+                  <>
+                    <Loader2 className="w-6 h-6 text-[#FF4FA3] animate-spin mb-1" />
+                    <span className="text-[11px] font-bold text-[#FF4FA3]">Uploading...</span>
+                    <span className="text-[9px] text-[#98A0AE]">Saving to cloud</span>
+                  </>
+                ) : (
+                  <>
+                    <UploadCloud className="w-6 h-6 text-[#FF4FA3] group-hover:scale-110 transition-transform mb-1" />
+                    <span className="text-[11px] font-bold text-[#263550] group-hover:text-[#FF4FA3]">Upload Pictures</span>
+                    <span className="text-[9px] text-[#98A0AE]">PNG, JPG, WebP</span>
+                  </>
+                )}
+              </button>
+
+              {/* Hidden native file input */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={handleFileUpload}
+              />
             </div>
 
-            {/* Quick URL Input for test media */}
+            {/* Quick URL Input for external media */}
             <div className="flex gap-2">
               <input
                 type="url"
                 value={newImageUrl}
                 onChange={(e) => setNewImageUrl(e.target.value)}
-                placeholder="Paste image URL (e.g. Unsplash fashion photo)..."
+                placeholder="Or paste an image URL directly..."
                 className="flex-1 px-3 py-1.5 rounded-xl border border-[#DDE1E7] text-xs text-[#263550] outline-none"
               />
               <button
                 type="button"
                 onClick={handleAddImage}
-                className="neria-btn-secondary px-3 py-1.5 text-xs font-semibold"
+                className="neria-btn-secondary px-3 py-1.5 text-xs font-semibold cursor-pointer"
               >
-                Add Image
+                Add URL
               </button>
             </div>
           </div>

@@ -232,6 +232,39 @@ export async function updateOrderFulfillment(
   );
 }
 
+export async function updateOrderStatus(
+  id: string,
+  paymentStatus: OrderStatus,
+  notes?: string,
+): Promise<void> {
+  await setDoc(
+    doc(db, "orders", id),
+    {
+      paymentStatus,
+      fulfillmentStatus: paymentStatus === "Refunded" ? "Returned" : "Unfulfilled",
+      notes: notes || undefined,
+      updatedAt: serverTimestamp(),
+    },
+    { merge: true },
+  );
+}
+
+export async function updateOrderDelivery(
+  id: string,
+  trackingNumber: string,
+  fulfillmentStatus: FulfillmentStatus = "Shipped",
+): Promise<void> {
+  await setDoc(
+    doc(db, "orders", id),
+    {
+      trackingNumber,
+      fulfillmentStatus,
+      updatedAt: serverTimestamp(),
+    },
+    { merge: true },
+  );
+}
+
 /** Real-time orders grouped by user — used by the customer detail page. */
 export async function ordersForUser(uid: string): Promise<Order[]> {
   const q = query(collection(db, "orders"), where("userId", "==", uid));
