@@ -12,6 +12,7 @@ import {
   SlidersHorizontal, X, DollarSign, Calendar
 } from 'lucide-react';
 import { FulfillmentStatus, Order } from '@/src/lib/types';
+import { createOrder } from '@/src/lib/firebase/orders';
 
 export default function OrdersPage() {
   const { orders, setOrders, fulfillOrder, addToast } = useAdmin();
@@ -78,7 +79,7 @@ export default function OrdersPage() {
     });
   };
 
-  const handleCreateManualOrder = (e: React.FormEvent) => {
+  const handleCreateManualOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newOrderCustomer) return;
 
@@ -130,14 +131,22 @@ export default function OrdersPage() {
       ]
     };
 
-    setOrders([newOrder, ...orders]);
-    setIsCreateModalOpen(false);
-    setNewOrderCustomer('');
-    addToast({
-      type: 'success',
-      title: 'Order Created ♡',
-      description: `Manual order #${newOrder.orderNumber} placed for ${newOrderCustomer}.`
-    });
+    try {
+      await createOrder(newOrder);
+      setIsCreateModalOpen(false);
+      setNewOrderCustomer('');
+      addToast({
+        type: 'success',
+        title: 'Order Created ♡',
+        description: `Manual order #${newOrder.orderNumber} placed for ${newOrderCustomer} and saved to Firestore.`
+      });
+    } catch (err) {
+      addToast({
+        type: 'error',
+        title: 'Order Creation Failed',
+        description: err instanceof Error ? err.message : 'Could not save order to Firestore.'
+      });
+    }
   };
 
   return (

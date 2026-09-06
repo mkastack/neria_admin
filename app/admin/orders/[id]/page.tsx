@@ -11,6 +11,7 @@ import {
   Package, Truck, User, MapPin, Phone, Mail, ShieldAlert,
   CreditCard, Tag, Plus, Send, AlertTriangle
 } from 'lucide-react';
+import { updateOrderStatus } from '@/src/lib/firebase/orders';
 
 export default function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
@@ -41,19 +42,22 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
     });
   };
 
-  const handleConfirmRefund = () => {
-    setOrders(prev => prev.map(o => {
-      if (o.id === order.id) {
-        return { ...o, paymentStatus: 'Refunded', fulfillmentStatus: 'Returned' };
-      }
-      return o;
-    }));
-    setIsRefundModalOpen(false);
-    addToast({
-      type: 'info',
-      title: 'Refund Processed ♡',
-      description: `$ ${refundAmount} refunded for order ${order.orderNumber}.`
-    });
+  const handleConfirmRefund = async () => {
+    try {
+      await updateOrderStatus(order.id, 'Refunded', refundReason);
+      setIsRefundModalOpen(false);
+      addToast({
+        type: 'info',
+        title: 'Refund Processed ♡',
+        description: `$ ${refundAmount} refunded for order ${order.orderNumber} in Firestore.`
+      });
+    } catch (err) {
+      addToast({
+        type: 'error',
+        title: 'Refund Failed',
+        description: err instanceof Error ? err.message : 'Could not update order status.'
+      });
+    }
   };
 
   return (

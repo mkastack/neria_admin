@@ -11,6 +11,7 @@ import {
   Search, SlidersHorizontal, RefreshCw, Plus, ArrowUpRight
 } from 'lucide-react';
 import { Product } from '@/src/lib/types';
+import { updateProduct } from '@/src/lib/firebase/products';
 
 export default function InventoryPage() {
   const { products, setProducts, addToast } = useAdmin();
@@ -37,28 +38,35 @@ export default function InventoryPage() {
     setIsAdjustModalOpen(true);
   };
 
-  const handleSaveAdjustment = (e: React.FormEvent) => {
+  const handleSaveAdjustment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedProduct) return;
 
-    setProducts(prev => prev.map(p => {
-      if (p.id === selectedProduct.id) {
-        const newStock = Math.max(0, p.stock + adjustmentAmount);
-        return {
-          ...p,
-          stock: newStock,
-          variants: p.variants.map(v => ({ ...v, stock: Math.max(0, v.stock + Math.floor(adjustmentAmount / p.variants.length || 1)) }))
-        };
-      }
-      return p;
+    const newStock = Math.max(0, selectedProduct.stock + adjustmentAmount);
+    const updatedVariants = selectedProduct.variants.map(v => ({
+      ...v,
+      stock: Math.max(0, v.stock + Math.floor(adjustmentAmount / (selectedProduct.variants.length || 1)))
     }));
 
-    setIsAdjustModalOpen(false);
-    addToast({
-      type: 'success',
-      title: 'Inventory Adjusted ♡',
-      description: `Stock for ${selectedProduct.name} updated by ${adjustmentAmount > 0 ? `+${adjustmentAmount}` : adjustmentAmount} units.`
-    });
+    try {
+      await updateProduct(selectedProduct.id, {
+        stock: newStock,
+        variants: updatedVariants,
+      });
+
+      setIsAdjustModalOpen(false);
+      addToast({
+        type: 'success',
+        title: 'Inventory Adjusted ♡',
+        description: `Stock for ${selectedProduct.name} updated by ${adjustmentAmount > 0 ? `+${adjustmentAmount}` : adjustmentAmount} units in Firestore.`
+      });
+    } catch (err) {
+      addToast({
+        type: 'error',
+        title: 'Adjustment Failed',
+        description: err instanceof Error ? err.message : 'Could not update stock in Firestore.'
+      });
+    }
   };
 
   return (

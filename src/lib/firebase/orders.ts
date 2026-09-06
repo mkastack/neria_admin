@@ -271,3 +271,17 @@ export async function ordersForUser(uid: string): Promise<Order[]> {
   const snap = await getDocs(q);
   return snap.docs.map((d) => toOrder(d.id, d.data()));
 }
+
+export async function createOrder(order: Order): Promise<void> {
+  const docRef = doc(db, "orders", order.id);
+  await setDoc(docRef, {
+    ...order,
+    totalCents: Math.round(order.total * 100),
+    subtotalCents: Math.round(order.subtotal * 100),
+    shippingCents: Math.round(order.shippingFee * 100),
+    discountCents: Math.round(order.discount * 100),
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+}
+

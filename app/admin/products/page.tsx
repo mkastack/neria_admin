@@ -240,6 +240,15 @@ export default function ProductsPage() {
                     </td>
                     <td className="py-3.5 px-4 text-right">
                       <div className="flex items-center justify-end gap-1.5">
+                        <a
+                          href="https://neria-commerce.vercel.app/shop"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-1.5 rounded-lg text-[#98A0AE] hover:text-[#FF4FA3] hover:bg-[#FFF4F8] transition-colors"
+                          title="View on Live Storefront"
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                        </a>
                         <Link
                           href={`/admin/products/new`}
                           className="p-1.5 rounded-lg text-[#98A0AE] hover:text-[#FF4FA3] hover:bg-[#FFF4F8] transition-colors"
@@ -299,6 +308,15 @@ export default function ProductsPage() {
                 <div className="pt-3 border-t border-[#F2F3F5] flex items-center justify-between">
                   <span className="text-[11px] text-[#667085]">{product.category}</span>
                   <div className="flex items-center gap-1">
+                    <a
+                      href="https://neria-commerce.vercel.app/shop"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-1.5 rounded-lg text-[#98A0AE] hover:text-[#FF4FA3] hover:bg-[#FFF4F8]"
+                      title="View on Live Storefront"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                    </a>
                     <Link
                       href="/admin/products/new"
                       className="p-1.5 rounded-lg text-[#98A0AE] hover:text-[#FF4FA3] hover:bg-[#FFF4F8]"
