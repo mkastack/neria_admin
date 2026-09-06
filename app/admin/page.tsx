@@ -85,7 +85,7 @@ export default function AdminDashboardPage() {
           </button>
 
           <a
-            href="https://neriacollective.com"
+            href="https://neria-commerce.vercel.app"
             target="_blank"
             rel="noopener noreferrer"
             className="neria-btn-primary px-3.5 py-2 text-xs font-medium inline-flex items-center gap-1.5 cursor-pointer"

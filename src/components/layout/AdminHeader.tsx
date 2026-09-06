@@ -220,12 +220,12 @@ export function AdminHeader() {
         </button>
 
         <a
-          href="https://neriacollective.com"
+          href="https://neria-commerce.vercel.app"
           target="_blank"
           rel="noopener noreferrer"
           className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-[#667085] hover:text-[#FF4FA3] hover:bg-[#FFF4F8] border border-transparent hover:border-[#FFD8EA] transition-all"
         >
-          <span>Store</span>
+          <span>Live Store</span>
           <ExternalLink className="w-3 h-3" />
         </a>
 
