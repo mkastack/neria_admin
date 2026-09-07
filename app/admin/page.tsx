@@ -96,6 +96,24 @@ export default function AdminDashboardPage() {
       Other: '#667085',
     };
 
+    // Canonical category name map — normalises any capitalisation from Firestore
+    const CANONICAL: Record<string, string> = {
+      hoodies: 'Hoodies',
+      hoodie: 'Hoodies',
+      dresses: 'Dresses',
+      dress: 'Dresses',
+      tops: 'Tops',
+      top: 'Tops',
+      sets: 'Sets',
+      set: 'Sets',
+      accessories: 'Accessories',
+      accessory: 'Accessories',
+    };
+    const normalise = (raw: string) => {
+      const lower = raw.trim().toLowerCase();
+      return CANONICAL[lower] || Object.keys(CANONICAL).find(k => lower.includes(k)) && CANONICAL[Object.keys(CANONICAL).find(k => lower.includes(k))!] || 'Other';
+    };
+
     const catTotals: Record<string, { revenue: number; units: number }> = {
       Hoodies: { revenue: 0, units: 0 },
       Dresses: { revenue: 0, units: 0 },
@@ -107,18 +125,19 @@ export default function AdminDashboardPage() {
     // Calculate from real orders
     for (const o of orders) {
       for (const it of o.items) {
-        // match product category
         const matchedProd = products.find((p) => p.id === it.productId || p.name === it.name);
-        const cat = matchedProd?.category || 'Hoodies';
+        const rawCat = matchedProd?.category || '';
+        const cat = rawCat ? normalise(rawCat) : 'Other';
         if (!catTotals[cat]) catTotals[cat] = { revenue: 0, units: 0 };
         catTotals[cat].revenue += (it.total || it.price * it.quantity || 0);
         catTotals[cat].units += (it.quantity || 1);
       }
     }
 
-    // Also include catalog products if order volume is small
+    // Also include catalog products' salesCount / revenue
     for (const p of products) {
-      const cat = p.category || 'Other';
+      const rawCat = p.category || '';
+      const cat = rawCat ? normalise(rawCat) : 'Other';
       if (!catTotals[cat]) catTotals[cat] = { revenue: 0, units: 0 };
       catTotals[cat].revenue += (p.revenue || p.salesCount * p.price || 0);
       catTotals[cat].units += (p.salesCount || 0);
@@ -126,15 +145,24 @@ export default function AdminDashboardPage() {
 
     const totalRev = Object.values(catTotals).reduce((sum, c) => sum + c.revenue, 0);
 
-    const list = Object.entries(catTotals).map(([name, data]) => {
-      const pct = totalRev > 0 ? Math.round((data.revenue / totalRev) * 100) : (name === 'Hoodies' ? 35 : name === 'Dresses' ? 25 : name === 'Tops' ? 20 : 10);
-      return {
-        name,
-        value: pct,
-        revenue: Math.round(data.revenue),
-        color: palette[name] || '#FF4FA3',
-      };
-    });
+    // Default weights when there's no real revenue yet
+    const defaultWeights: Record<string, number> = {
+      Hoodies: 35, Dresses: 25, Tops: 20, Sets: 10, Accessories: 10,
+    };
+
+    const list = Object.entries(catTotals)
+      .filter(([, data]) => totalRev > 0 || data.units > 0 || true) // always show all 5 base cats
+      .map(([name, data]) => {
+        const pct = totalRev > 0
+          ? Math.round((data.revenue / totalRev) * 100)
+          : (defaultWeights[name] ?? 5);
+        return {
+          name,
+          value: pct,
+          revenue: Math.round(data.revenue),
+          color: palette[name] || '#FF4FA3',
+        };
+      });
 
     list.sort((a, b) => b.value - a.value);
     const top = list[0] || { name: 'Hoodies', value: 35 };

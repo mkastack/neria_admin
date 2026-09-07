@@ -42,10 +42,10 @@ export default function CustomersPage() {
     return true;
   });
 
-  const vipCount = customers.filter(c => c.segment === 'VIP').length;
-  const newCount = customers.filter(c => c.segment === 'New').length;
-  const returningCount = customers.filter(c => c.segment === 'Returning').length;
-  const avgSpend = Math.round(customers.reduce((acc, c) => acc + c.totalSpent, 0) / (customers.length || 1));
+  const vipCount = customers.filter(c => c.segment === 'VIP' || (c.totalSpent && c.totalSpent >= 500)).length;
+  const newCount = customers.filter(c => c.segment === 'New' || c.ordersCount <= 1).length;
+  const returningCount = customers.filter(c => c.segment === 'Returning' || c.ordersCount > 1).length;
+  const avgSpend = customers.length > 0 ? Math.round(customers.reduce((acc, c) => acc + (c.totalSpent || 0), 0) / customers.length) : 0;
 
   const handleAddCustomer = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -132,8 +132,9 @@ export default function CustomersPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           title="Total Customers"
-          value="1,280"
-          change="+14.2%"
+          value={`${customers.length.toLocaleString()}`}
+          change={`${newCount} Registered`}
+          comparisonText="active shoppers"
           isPositive={true}
           theme="pink"
           icon={<Users className="w-5 h-5" />}
@@ -141,7 +142,8 @@ export default function CustomersPage() {
         <StatCard
           title="VIP Neria Girls"
           value={`${vipCount} VIPs`}
-          change="Top Spenders"
+          change={vipCount > 0 ? `${Math.round((vipCount / (customers.length || 1)) * 100)}% of total` : "Top Spenders"}
+          comparisonText="spend ≥ $500"
           isPositive={true}
           theme="cream"
           icon={<Heart className="w-5 h-5" />}
@@ -149,7 +151,8 @@ export default function CustomersPage() {
         <StatCard
           title="Returning Shoppers"
           value={`${returningCount} Active`}
-          change="48% Retention"
+          change={customers.length > 0 ? `${Math.round((returningCount / customers.length) * 100)}% Retention` : "Repeat buyers"}
+          comparisonText="multi-order shoppers"
           isPositive={true}
           theme="blue"
           icon={<UserCheck className="w-5 h-5" />}
@@ -157,7 +160,8 @@ export default function CustomersPage() {
         <StatCard
           title="Average Lifetime Value"
           value={`$ ${avgSpend.toLocaleString()}`}
-          change="+8.4% AOV"
+          change={customers.length > 0 ? `$${Math.round(customers.reduce((acc, c) => acc + (c.totalSpent || 0), 0) / (customers.reduce((acc, c) => acc + (c.ordersCount || 1), 0) || 1))} / order` : "Across clients"}
+          comparisonText="average customer LTV"
           isPositive={true}
           theme="white"
           icon={<DollarSign className="w-5 h-5" />}

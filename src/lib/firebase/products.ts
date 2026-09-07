@@ -68,7 +68,19 @@ function toProduct(id: string, raw: DocumentData): Product {
     cost: typeof raw.cost === "number" ? raw.cost : 0,
     sku: raw.sku ?? "",
     barcode: raw.barcode ?? undefined,
-    stock: typeof raw.stock === "number" ? raw.stock : 0,
+    stock: (() => {
+      const explicitStock =
+        typeof raw.stock === "number"
+          ? raw.stock
+          : typeof raw.quantity === "number"
+            ? raw.quantity
+            : typeof raw.inventory === "number"
+              ? raw.inventory
+              : undefined;
+      const variantsList = Array.isArray(raw.variants) ? (raw.variants as ProductVariant[]) : [];
+      const variantTotal = variantsList.reduce((acc, v) => acc + (typeof v.stock === "number" ? v.stock : 0), 0);
+      return typeof explicitStock === "number" ? explicitStock : (variantTotal > 0 ? variantTotal : 0);
+    })(),
     lowStockThreshold:
       typeof raw.lowStockThreshold === "number" ? raw.lowStockThreshold : 5,
     trackQuantity: raw.trackQuantity !== false,

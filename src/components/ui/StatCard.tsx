@@ -21,15 +21,15 @@ interface StatCardProps {
 /* ─── Animated counter ─────────────────────────────────────────── */
 function AnimatedValue({ value }: { value: string }) {
   const [displayed, setDisplayed] = useState(value);
-  const started = useRef(false);
+  const prevTargetRef = useRef<number | null>(null);
 
   useEffect(() => {
-    if (started.current) return;
-    started.current = true;
-
     // Match the first number (with optional commas/decimals) in the string
     const match = value.match(/[\d,]+\.?\d*/);
-    if (!match || match.index === undefined) return;
+    if (!match || match.index === undefined) {
+      setDisplayed(value);
+      return;
+    }
 
     const raw = match[0];                              // e.g. "48,920" or "3.8"
     const target = parseFloat(raw.replace(/,/g, '')); // 48920 or 3.8
@@ -39,14 +39,28 @@ function AnimatedValue({ value }: { value: string }) {
     const decimals = hasDecimals ? (raw.split('.')[1]?.length ?? 1) : 0;
     const useCommas = target >= 1000;
 
-    const duration = 1000;
+    const startVal = prevTargetRef.current !== null ? prevTargetRef.current : 0;
+    prevTargetRef.current = target;
+
+    if (startVal === target) {
+      const formatted = hasDecimals
+        ? target.toFixed(decimals)
+        : useCommas
+          ? Math.round(target).toLocaleString('en-US')
+          : String(Math.round(target));
+      setDisplayed(`${prefix}${formatted}${suffix}`);
+      return;
+    }
+
+    const duration = 750;
     const startTime = performance.now();
+    let animFrame: number;
 
     const tick = (now: number) => {
       const t = Math.min((now - startTime) / duration, 1);
       // Ease-out quart
       const eased = 1 - Math.pow(1 - t, 4);
-      const current = target * eased;
+      const current = startVal + (target - startVal) * eased;
 
       let formatted: string;
       if (hasDecimals) {
@@ -58,11 +72,15 @@ function AnimatedValue({ value }: { value: string }) {
       }
 
       setDisplayed(`${prefix}${formatted}${suffix}`);
-      if (t < 1) requestAnimationFrame(tick);
+      if (t < 1) {
+        animFrame = requestAnimationFrame(tick);
+      }
     };
 
-    // Small delay so the card entrance animation plays first
-    setTimeout(() => requestAnimationFrame(tick), 180);
+    animFrame = requestAnimationFrame(tick);
+    return () => {
+      if (animFrame) cancelAnimationFrame(animFrame);
+    };
   }, [value]);
 
   return <span>{displayed}</span>;
@@ -218,7 +236,7 @@ export function StatCard({
   value,
   change,
   isPositive = true,
-  comparisonText = 'vs previous period',
+  comparisonText,
   icon,
   theme = 'white',
   sparklineData = [28, 38, 32, 52, 45, 68, 60, 80, 74, 92],
@@ -332,9 +350,11 @@ export function StatCard({
             }
             {change}
           </span>
-          <span className="text-[10px] text-[#B0B8C5] font-medium ml-0.5 leading-tight">
-            {comparisonText}
-          </span>
+          {comparisonText && (
+            <span className="text-[10px] text-[#B0B8C5] font-medium ml-0.5 leading-tight">
+              {comparisonText}
+            </span>
+          )}
         </div>
 
         <div className="shrink-0 w-[88px] h-[38px]">

@@ -209,10 +209,10 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   const [localReviews, setLocalReviews] = useState<Review[]>([]);
   const [localStaff, setLocalStaff] = useState<StaffMember[]>([]);
 
-  const giftCards = liveGiftCards.length > 0 ? liveGiftCards : (localGiftCards.length > 0 ? localGiftCards : mockGiftCards);
-  const shippingZones = liveShippingZones.length > 0 ? liveShippingZones : (localShippingZones.length > 0 ? localShippingZones : mockShippingZones);
-  const reviews = liveReviews.length > 0 ? liveReviews : (localReviews.length > 0 ? localReviews : mockReviews);
-  const staff = liveStaff.length > 0 ? liveStaff : (localStaff.length > 0 ? localStaff : mockStaff);
+  const giftCards = localGiftCards.length > 0 ? localGiftCards : liveGiftCards;
+  const shippingZones = localShippingZones.length > 0 ? localShippingZones : liveShippingZones;
+  const reviews = localReviews.length > 0 ? localReviews : liveReviews;
+  const staff = localStaff.length > 0 ? localStaff : liveStaff;
 
   const setGiftCards: React.Dispatch<React.SetStateAction<GiftCard[]>> = setLocalGiftCards;
   const setShippingZones: React.Dispatch<React.SetStateAction<ShippingZone[]>> = setLocalShippingZones;

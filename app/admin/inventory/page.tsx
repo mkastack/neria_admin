@@ -85,25 +85,28 @@ export default function InventoryPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           title="Total Units on Hand"
-          value={`${totalUnits} pcs`}
-          change="+5.2%"
-          isPositive={true}
+          value={`${totalUnits.toLocaleString()} pcs`}
+          change={`${products.length} SKUs in Catalog`}
+          comparisonText="warehouse inventory"
+          isPositive={totalUnits > 0}
           theme="pink"
           icon={<Boxes className="w-5 h-5" />}
         />
         <StatCard
           title="Low Stock Alerts"
-          value={`${lowStockProducts.length} items`}
-          change="Requires Restock"
-          isPositive={false}
+          value={`${lowStockProducts.length.toLocaleString()} items`}
+          change={lowStockProducts.length > 0 ? "Requires Restock" : "Healthy Stock"}
+          comparisonText="threshold ≤ safety level"
+          isPositive={lowStockProducts.length === 0}
           theme="cream"
           icon={<AlertTriangle className="w-5 h-5" />}
         />
         <StatCard
           title="Out of Stock SKUs"
-          value={`${outOfStockProducts.length} items`}
-          change="Urgent Attention"
-          isPositive={false}
+          value={`${outOfStockProducts.length.toLocaleString()} items`}
+          change={outOfStockProducts.length > 0 ? "Urgent Attention" : "Zero Stockouts"}
+          comparisonText="0 units on hand"
+          isPositive={outOfStockProducts.length === 0}
           theme="white"
           icon={<XCircle className="w-5 h-5" />}
         />
@@ -111,7 +114,8 @@ export default function InventoryPage() {
           title="Total Stock Valuation"
           value={`$ ${totalValuation.toLocaleString()}`}
           change="Retail Value"
-          isPositive={true}
+          comparisonText="inventory worth"
+          isPositive={totalValuation > 0}
           theme="blue"
           icon={<DollarSign className="w-5 h-5" />}
         />
@@ -147,11 +151,20 @@ export default function InventoryPage() {
                 }`}
               >
                 <div className="flex items-center gap-3 min-w-0">
-                  <img
-                    src={item.images[0]}
-                    alt={item.name}
-                    className="w-12 h-12 rounded-xl object-cover border border-white shadow-2xs shrink-0"
-                  />
+                  <div className="w-12 h-12 rounded-xl border border-white shadow-2xs shrink-0 overflow-hidden bg-[#FFF4F8] flex items-center justify-center">
+                    {item.images && item.images[0] ? (
+                      <img
+                        src={item.images[0]}
+                        alt={item.name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                    ) : (
+                      <span className="text-base">👗</span>
+                    )}
+                  </div>
                   <div className="min-w-0">
                     <h4 className="text-xs font-bold text-[#263550] truncate">{item.name}</h4>
                     <p className="text-[11px] text-[#667085]">{item.sku}</p>
@@ -207,7 +220,20 @@ export default function InventoryPage() {
                 <tr key={p.id} className="hover:bg-[#FFF4F8]/40 transition-colors">
                   <td className="py-3.5 px-4">
                     <div className="flex items-center gap-3">
-                      <img src={p.images[0]} alt={p.name} className="w-9 h-9 rounded-xl object-cover" />
+                      <div className="w-9 h-9 rounded-xl overflow-hidden bg-[#FFF4F8] shrink-0 flex items-center justify-center">
+                        {p.images && p.images[0] ? (
+                          <img
+                            src={p.images[0]}
+                            alt={p.name}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                            }}
+                          />
+                        ) : (
+                          <span className="text-xs">👗</span>
+                        )}
+                      </div>
                       <div>
                         <p className="font-bold text-[#263550]">{p.name}</p>
                         <p className="text-[11px] text-[#98A0AE]">{p.variants.length} Variants</p>
