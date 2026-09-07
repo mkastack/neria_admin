@@ -7,37 +7,63 @@ import { Modal } from '@/src/components/ui/Modal';
 import { ShieldCheck, UserPlus, Mail, Shield, Trash2, CheckCircle2 } from 'lucide-react';
 import { StaffMember } from '@/src/lib/types';
 
+import { inviteOrAddStaffInDB, removeStaffInDB } from '@/src/lib/firebase/staff';
+
 export default function StaffPage() {
-  const { staff, setStaff, addToast } = useAdmin();
+  const { staff, addToast } = useAdmin();
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [role, setRole] = useState<'Store Manager' | 'Order Manager' | 'Inventory Manager' | 'Customer Support'>('Store Manager');
 
-  const handleInvite = (e: React.FormEvent) => {
+  const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !email.trim()) return;
 
-    const newStaff: StaffMember = {
-      id: `st-${Date.now()}`,
-      name,
-      email,
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80',
-      role,
-      lastActive: 'Invited',
-      status: 'Invited',
-      createdAt: new Date().toISOString().split('T')[0]
-    };
+    setIsSubmitting(true);
+    try {
+      await inviteOrAddStaffInDB({
+        name: name.trim(),
+        email: email.trim().toLowerCase(),
+        role,
+      });
 
-    setStaff([...staff, newStaff]);
-    setIsInviteModalOpen(false);
-    setName('');
-    setEmail('');
-    addToast({
-      type: 'success',
-      title: 'Invitation Sent ♡',
-      description: `Staff invite emailed to ${email}.`
-    });
+      setIsInviteModalOpen(false);
+      setName('');
+      setEmail('');
+      addToast({
+        type: 'success',
+        title: 'Staff Access Granted ♡',
+        description: `${name} has been assigned ${role} role in Firestore and can access the dashboard.`
+      });
+    } catch (err) {
+      addToast({
+        type: 'error',
+        title: 'Invite Failed',
+        description: err instanceof Error ? err.message : 'Please try again.'
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleRemove = async (id: string, memberName: string) => {
+    if (!confirm(`Revoke dashboard access for ${memberName}?`)) return;
+    try {
+      await removeStaffInDB(id);
+      addToast({
+        type: 'info',
+        title: 'Access Revoked',
+        description: `${memberName} is no longer authorized to access the dashboard.`
+      });
+    } catch (err) {
+      addToast({
+        type: 'error',
+        title: 'Revoke Failed',
+        description: err instanceof Error ? err.message : 'Please try again.'
+      });
+    }
   };
 
   return (
@@ -72,6 +98,7 @@ export default function StaffPage() {
                 <th className="py-4 px-3">Last Active</th>
                 <th className="py-4 px-3">Status</th>
                 <th className="py-4 px-4 text-right">Joined</th>
+                <th className="py-4 px-4 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#F2F3F5] text-xs">
@@ -95,6 +122,15 @@ export default function StaffPage() {
                   </td>
                   <td className="py-3.5 px-4 text-right text-[#98A0AE]">
                     {st.createdAt}
+                  </td>
+                  <td className="py-3.5 px-4 text-right">
+                    <button
+                      onClick={() => handleRemove(st.id, st.name)}
+                      title="Revoke Access"
+                      className="p-1.5 rounded-lg text-[#98A0AE] hover:text-[#B42318] hover:bg-[#FEF3F2] transition-colors cursor-pointer"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
                   </td>
                 </tr>
               ))}

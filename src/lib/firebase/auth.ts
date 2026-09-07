@@ -102,21 +102,84 @@ export function useIsAdmin(): {
   useEffect(() => {
     let cancelled = false;
 
-    async function resolve() {
-      if (!user) {
-        if (!cancelled) {
-          setIsAdmin(false);
-          setResolved(true);
-        }
-        return;
-      }
+    if (!user) {
+      setIsAdmin(false);
+      setResolved(true);
+      return;
+    }
+
+    // Defer-import firestore helpers to avoid cycles
+    let unsubUserDoc: (() => void) | null = null;
+
+    async function checkAccess() {
       try {
-        const token = await user.getIdToken(/* forceRefresh */ true);
+        // 1. Check custom claim token
+        const token = await user!.getIdToken(/* forceRefresh */ true);
         const claims = JSON.parse(atob(token.split(".")[1] ?? ""));
-        if (!cancelled) {
-          setIsAdmin(!!claims.admin);
-          setResolved(true);
+        if (claims.admin) {
+          if (!cancelled) {
+            setIsAdmin(true);
+            setResolved(true);
+          }
+          return;
         }
+      } catch (_) {}
+
+      // 2. Real-time check of users/{uid} doc
+      try {
+        const { db } = await import("./client");
+        const { doc, onSnapshot } = await import("firebase/firestore");
+        unsubUserDoc = onSnapshot(
+          doc(db, "users", user!.uid),
+          (snap) => {
+            if (cancelled) return;
+            const data = snap.data();
+            const role = (typeof data?.role === "string" ? data.role : "").toLowerCase();
+            const hasAdminRole = [
+              "super_admin",
+              "store_manager",
+              "order_manager",
+              "inventory_manager",
+              "marketing_manager",
+              "customer_support",
+              "finance_viewer",
+              "admin",
+            ].includes(role);
+
+            if (hasAdminRole) {
+              setIsAdmin(true);
+              setResolved(true);
+            } else {
+              // Also check staff collection by email
+              import("firebase/firestore").then(({ collection, getDocs, query, where }) => {
+                const userEmail = (user!.email || "").toLowerCase().trim();
+                if (!userEmail) {
+                  setIsAdmin(false);
+                  setResolved(true);
+                  return;
+                }
+                const q = query(collection(db, "staff"), where("email", "==", userEmail));
+                getDocs(q)
+                  .then((s) => {
+                    if (cancelled) return;
+                    setIsAdmin(!s.empty);
+                    setResolved(true);
+                  })
+                  .catch(() => {
+                    if (cancelled) return;
+                    setIsAdmin(false);
+                    setResolved(true);
+                  });
+              });
+            }
+          },
+          () => {
+            if (!cancelled) {
+              setIsAdmin(false);
+              setResolved(true);
+            }
+          }
+        );
       } catch {
         if (!cancelled) {
           setIsAdmin(false);
@@ -126,9 +189,11 @@ export function useIsAdmin(): {
     }
 
     setResolved(false);
-    void resolve();
+    void checkAccess();
+
     return () => {
       cancelled = true;
+      if (unsubUserDoc) unsubUserDoc();
     };
   }, [user]);
 

@@ -24,30 +24,29 @@ export default function AddProductPage() {
   const [description, setDescription] = useState('');
   const [shortDescription, setShortDescription] = useState('');
   const [category, setCategory] = useState<'Dresses' | 'Tops' | 'Sets' | 'Accessories' | 'Hoodies' | 'Other'>('Hoodies');
-  const [collection, setCollection] = useState('Bunny Love');
+  const [collection, setCollection] = useState('Core Lookbook');
   const [status, setStatus] = useState<'Active' | 'Draft' | 'Archived'>('Active');
   
   // Pricing
-  const [price, setPrice] = useState<number>(420);
-  const [comparePrice, setComparePrice] = useState<number>(480);
-  const [cost, setCost] = useState<number>(190);
+  const [price, setPrice] = useState<number | ''>('');
+  const [comparePrice, setComparePrice] = useState<number | ''>('');
+  const [cost, setCost] = useState<number | ''>('');
 
   // Profit calculation
-  const profit = Math.max(0, price - cost);
-  const margin = price > 0 ? ((profit / price) * 100).toFixed(1) : '0';
+  const numPrice = Number(price) || 0;
+  const numCost = Number(cost) || 0;
+  const profit = Math.max(0, numPrice - numCost);
+  const margin = numPrice > 0 ? ((profit / numPrice) * 100).toFixed(1) : '0';
 
   // Inventory
-  const [sku, setSku] = useState('NER-NEW-001');
-  const [stock, setStock] = useState<number>(25);
-  const [lowStockThreshold, setLowStockThreshold] = useState<number>(8);
+  const [sku, setSku] = useState('');
+  const [stock, setStock] = useState<number | ''>(0);
+  const [lowStockThreshold, setLowStockThreshold] = useState<number>(5);
   const [trackQuantity, setTrackQuantity] = useState<boolean>(true);
   const [allowBackorder, setAllowBackorder] = useState<boolean>(false);
 
-  // Media
-  const [images, setImages] = useState<string[]>([
-    'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=800&q=80',
-    'https://images.unsplash.com/photo-1578587018452-892bacefd3f2?w=800&q=80'
-  ]);
+  // Media (starts completely clean with 0 dummy images)
+  const [images, setImages] = useState<string[]>([]);
   const [newImageUrl, setNewImageUrl] = useState('');
 
   // Variants
@@ -70,7 +69,7 @@ export default function AddProductPage() {
     selectedSizes.map(size => ({
       name: `${color} / ${size}`,
       sku: `${sku}-${color.substring(0, 3).toUpperCase()}-${size}`,
-      price: price,
+      price: Number(price) || 0,
       stock: 10
     }))
   );
@@ -146,20 +145,20 @@ export default function AddProductPage() {
     const newProd: Omit<Product, 'id'> = {
       name,
       slug,
-      description: description || 'Beautiful piece from Neria Collective.',
-      shortDescription: shortDescription || 'Signature Neria style apparel.',
+      description: description.trim(),
+      shortDescription: shortDescription.trim(),
       category,
       collection,
       price: Number(price) || 0,
       compareAtPrice: Number(comparePrice) || undefined,
       cost: Number(cost) || 0,
-      sku: sku || `NER-${Date.now()}`,
+      sku: sku.trim() || `NER-${Date.now()}`,
       stock: Number(stock) || 0,
       lowStockThreshold: Number(lowStockThreshold) || 5,
       trackQuantity,
       allowBackorder,
       status,
-      images: images.length > 0 ? images : ['https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=800&q=80'],
+      images,
       variants: variantCombinations.map((v, i) => ({
         id: `v-${Date.now()}-${i}`,
         size: v.name.split('/')[1]?.trim() || 'M',
@@ -409,7 +408,7 @@ export default function AddProductPage() {
               <div className="col-span-2 sm:col-span-1">
                 <p className="text-[11px] text-[#98A0AE] font-medium">Discount Offer</p>
                 <p className="text-base font-bold text-[#027A48]">
-                  {comparePrice > price ? `Save $ ${comparePrice - price}` : 'Full Price'}
+                  {Number(comparePrice) > Number(price) ? `Save $ ${Number(comparePrice) - Number(price)}` : 'Full Price'}
                 </p>
               </div>
             </div>

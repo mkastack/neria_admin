@@ -36,12 +36,17 @@ export function usePromoCodes(): { discounts: Discount[]; loading: boolean } {
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     const unsub = onSnapshot(
-      query(collection(db, "promoCodes"), orderBy("code", "asc")),
+      collection(db, "promoCodes"),
       (snap) => {
-        setDiscounts(snap.docs.map((d) => toDiscount(d.id, d.data())));
+        const list = snap.docs.map((d) => toDiscount(d.id, d.data()));
+        list.sort((a, b) => (a.code || "").localeCompare(b.code || ""));
+        setDiscounts(list);
         setLoading(false);
       },
-      () => setLoading(false),
+      (err) => {
+        console.warn("[promoCodes] Real-time listener error:", err);
+        setLoading(false);
+      },
     );
     return () => unsub();
   }, []);
@@ -49,22 +54,28 @@ export function usePromoCodes(): { discounts: Discount[]; loading: boolean } {
 }
 
 export async function upsertPromoCode(d: Discount): Promise<void> {
-  // Codes are the doc id so the storefront can resolve a code in O(1)
-  // via getDoc(promoCodes, code).
-  const id = d.code.toUpperCase();
-  await setDoc(
-    doc(db, "promoCodes", id),
-    {
-      ...d,
-      code: id,
-      updatedAt: serverTimestamp(),
-    },
-    { merge: true },
-  );
+  const id = d.code.toUpperCase().trim();
+  const payload = {
+    ...d,
+    id,
+    code: id,
+    updatedAt: serverTimestamp(),
+  };
+
+  // Write to promoCodes
+  await setDoc(doc(db, "promoCodes", id), payload, { merge: true });
+
+  // Also write to discounts collection for backward compatibility
+  try {
+    await setDoc(doc(db, "discounts", id), payload, { merge: true });
+  } catch (_) {}
 }
 
 export async function deletePromoCode(code: string): Promise<void> {
-  const id = code.toUpperCase();
+  const id = code.toUpperCase().trim();
   await deleteDoc(doc(db, "promoCodes", id));
+  try {
+    await deleteDoc(doc(db, "discounts", id));
+  } catch (_) {}
 }
 

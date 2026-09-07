@@ -9,19 +9,26 @@ import {
   DollarSign, Calendar, Tag, Plus, Send, Clock
 } from 'lucide-react';
 
+import { useCustomer, addCustomerNoteInDB } from '@/src/lib/firebase/customers';
+import { Loader2 } from 'lucide-react';
+
 export default function CustomerDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
-  const { customers, setCustomers, orders, addToast } = useAdmin();
+  const { customers, orders, addToast } = useAdmin();
+  const { customer: liveCustomer, loading: isCustomerLoading } = useCustomer(resolvedParams.id);
 
-  const customer = customers.find(c => c.id === resolvedParams.id) || customers[0];
-  const customerOrders = orders.filter(o => o.customer.email === customer.email || o.customer.id === customer.id);
+  const fallbackCustomer = customers.find(c => c.id === resolvedParams.id) || customers[0];
+  const customer = liveCustomer || fallbackCustomer;
+  const customerOrders = orders.filter(
+    o => (customer?.email && o.customer.email === customer.email) || (customer?.id && o.customer.id === customer.id)
+  );
 
-  const [notes, setNotes] = useState(customer.notes || []);
   const [newNote, setNewNote] = useState('');
+  const [isSavingNote, setIsSavingNote] = useState(false);
 
-  const handleAddNote = (e: React.FormEvent) => {
+  const handleAddNote = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newNote.trim()) return;
+    if (!newNote.trim() || !customer?.id) return;
 
     const noteItem = {
       id: `n-${Date.now()}`,
@@ -30,14 +37,44 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
       timestamp: new Date().toISOString()
     };
 
-    setNotes([noteItem, ...notes]);
-    setNewNote('');
-    addToast({
-      type: 'success',
-      title: 'Customer Note Added',
-      description: 'Note attached to client profile.'
-    });
+    setIsSavingNote(true);
+    try {
+      await addCustomerNoteInDB(customer.id, noteItem);
+      setNewNote('');
+      addToast({
+        type: 'success',
+        title: 'Customer Note Added ♡',
+        description: 'Note saved in real-time to customer profile.'
+      });
+    } catch (err) {
+      addToast({
+        type: 'error',
+        title: 'Could not save note',
+        description: err instanceof Error ? err.message : 'Please try again.'
+      });
+    } finally {
+      setIsSavingNote(false);
+    }
   };
+
+  if (isCustomerLoading && !customer) {
+    return (
+      <div className="min-h-[400px] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-2">
+          <Loader2 className="w-6 h-6 text-[#FF4FA3] animate-spin" />
+          <p className="text-xs text-[#98A0AE] font-semibold">Loading real-time customer data…</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!customer) {
+    return (
+      <div className="p-12 text-center bg-white rounded-3xl border border-[#F2F3F5] text-sm text-[#98A0AE]">
+        Customer profile not found.
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -152,14 +189,18 @@ export default function CustomerDetailPage({ params }: { params: Promise<{ id: s
             </form>
 
             <div className="space-y-2.5 pt-2 border-t border-[#F2F3F5]">
-              {notes.map((n) => (
-                <div key={n.id} className="p-3 rounded-xl bg-[#FFF4F8] border border-[#FFD8EA] text-xs text-[#263550]">
-                  <p className="leading-relaxed">{n.text}</p>
-                  <span className="text-[10px] text-[#98A0AE] mt-1 block">
-                    By {n.author} • {new Date(n.timestamp).toLocaleDateString()}
-                  </span>
-                </div>
-              ))}
+              {(customer.notes || []).length === 0 ? (
+                <p className="text-[11px] text-[#98A0AE] text-center py-2">No notes attached yet.</p>
+              ) : (
+                (customer.notes || []).map((n) => (
+                  <div key={n.id} className="p-3 rounded-xl bg-[#FFF4F8] border border-[#FFD8EA] text-xs text-[#263550]">
+                    <p className="leading-relaxed">{n.text}</p>
+                    <span className="text-[10px] text-[#98A0AE] mt-1 block">
+                      By {n.author} • {new Date(n.timestamp).toLocaleDateString()}
+                    </span>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>

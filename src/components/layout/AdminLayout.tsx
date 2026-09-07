@@ -17,15 +17,16 @@ import { Lock } from 'lucide-react';
 function AdminLayoutInner({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { isSidebarCollapsed, isLoading, loaderMessage } = useAdmin();
+  const { isSidebarCollapsed, isLoading, loaderMessage, currentRole } = useAdmin();
   const { user, loading: authLoading } = useAuthUser();
   const { isAdmin, loading: claimLoading } = useIsAdmin();
 
+  // Allow access if user holds admin custom claim OR has an admin/staff role in Firestore
+  const isAuthorized = isAdmin || (!!currentRole && currentRole !== 'customer');
+
   // Auth & admin-claim guard for the entire /admin section.
   // - /admin/login and /admin/forgot-password are public.
-  // - Everything else requires a signed-in user with the `admin` claim.
-  // - While we're still resolving the auth state, show a soft loading
-  //   screen rather than flashing the redirect.
+  // - Everything else requires a signed-in user with admin or staff access.
   const isAuthPage =
     pathname === '/admin/login' || pathname === '/admin/forgot-password';
   const isImmersiveMode =
@@ -38,14 +39,9 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
       router.replace(`/admin/login?next=${encodeURIComponent(pathname || '/admin')}`);
       return;
     }
-    if (!isAdmin) {
-      // Logged in but no admin claim — render the "not authorized"
-      // state in place rather than redirecting (so the user can read
-      // the grant-admin command).
-    }
-  }, [isAuthPage, authLoading, claimLoading, user, isAdmin, router, pathname]);
+  }, [isAuthPage, authLoading, claimLoading, user, isAuthorized, router, pathname]);
 
-  if (!isAuthPage && (authLoading || claimLoading)) {
+  if (!isAuthPage && (authLoading || (claimLoading && !isAuthorized))) {
     return (
       <main className="min-h-screen flex items-center justify-center bg-[#FFF4F8]">
         <div className="flex flex-col items-center gap-3">
@@ -61,7 +57,7 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (!isAuthPage && user && !isAdmin) {
+  if (!isAuthPage && user && !isAuthorized) {
     return (
       <main className="min-h-screen flex items-center justify-center bg-[#FFF4F8] p-6">
         <div className="max-w-md w-full bg-white rounded-3xl p-8 border border-[#FFD8EA] shadow-xl space-y-5 text-center">

@@ -8,40 +8,72 @@ import { Modal } from '@/src/components/ui/Modal';
 import { Gift, Plus, Sparkles, DollarSign, Copy, CheckCircle2 } from 'lucide-react';
 import { GiftCard } from '@/src/lib/types';
 
+import { createGiftCardInDB, deleteGiftCardInDB } from '@/src/lib/firebase/giftCards';
+
 export default function GiftCardsPage() {
-  const { giftCards, setGiftCards, addToast } = useAdmin();
+  const { giftCards, addToast } = useAdmin();
   const [isIssueModalOpen, setIsIssueModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [recipientName, setRecipientName] = useState('');
   const [recipientEmail, setRecipientEmail] = useState('');
   const [initialValue, setInitialValue] = useState<number>(350);
 
   const totalIssued = giftCards.reduce((acc, g) => acc + g.initialValue, 0);
   const totalBalance = giftCards.reduce((acc, g) => acc + g.balance, 0);
-  const totalRedeemed = totalIssued - totalBalance;
+  const totalRedeemed = Math.max(0, totalIssued - totalBalance);
 
-  const handleIssueGiftCard = (e: React.FormEvent) => {
+  const handleIssueGiftCard = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     const newCard: GiftCard = {
       id: `gc-${Date.now()}`,
       code: `NER-GIFT-${Math.floor(1000 + Math.random() * 9000)}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`,
-      customerName: recipientName || 'VIP Neria Girl',
+      customerName: recipientName || 'VIP Customer',
       customerEmail: recipientEmail,
-      initialValue: Number(initialValue),
-      balance: Number(initialValue),
+      initialValue: Number(initialValue) || 100,
+      balance: Number(initialValue) || 100,
       status: 'Active',
       createdAt: new Date().toISOString(),
       expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
     };
 
-    setGiftCards([newCard, ...giftCards]);
-    setIsIssueModalOpen(false);
-    setRecipientName('');
-    setRecipientEmail('');
-    addToast({
-      type: 'success',
-      title: 'Gift Card Issued ♡',
-      description: `$ ${initialValue} digital gift card created.`
-    });
+    try {
+      await createGiftCardInDB(newCard);
+      setIsIssueModalOpen(false);
+      setRecipientName('');
+      setRecipientEmail('');
+      addToast({
+        type: 'success',
+        title: 'Gift Card Issued ♡',
+        description: `$ ${initialValue} digital gift card saved in Firestore and ready for checkout on neria-commerce.`
+      });
+    } catch (err) {
+      addToast({
+        type: 'error',
+        title: 'Could not issue gift card',
+        description: err instanceof Error ? err.message : 'Please try again.'
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteCard = async (id: string, code: string) => {
+    if (!confirm(`Delete gift card ${code}?`)) return;
+    try {
+      await deleteGiftCardInDB(id);
+      addToast({
+        type: 'info',
+        title: 'Gift Card Deleted',
+        description: `Card ${code} removed from Firestore.`
+      });
+    } catch (err) {
+      addToast({
+        type: 'error',
+        title: 'Delete Failed',
+        description: err instanceof Error ? err.message : 'Please try again.'
+      });
+    }
   };
 
   return (

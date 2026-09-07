@@ -27,6 +27,34 @@ import type { Product, ProductVariant } from "@/src/lib/types";
  * so we widen the reader to pull those extra fields when present.
  */
 function toProduct(id: string, raw: DocumentData): Product {
+  const price =
+    typeof raw.price === "number"
+      ? raw.price
+      : typeof raw.priceCents === "number"
+        ? raw.priceCents / 100
+        : 0;
+
+  const compareAtPrice =
+    typeof raw.compareAtPrice === "number"
+      ? raw.compareAtPrice
+      : typeof raw.compareAtPriceCents === "number"
+        ? raw.compareAtPriceCents / 100
+        : undefined;
+
+  const images = Array.isArray(raw.images)
+    ? (raw.images.filter((img: unknown) => typeof img === "string" && img.trim().length > 0) as string[])
+    : typeof raw.image === "string" && raw.image
+      ? [raw.image]
+      : [];
+
+  const createdAt =
+    raw.createdAt?.toDate?.()?.toISOString?.() ??
+    (typeof raw.createdAt === "string" ? raw.createdAt : "");
+
+  const updatedAt =
+    raw.updatedAt?.toDate?.()?.toISOString?.() ??
+    (typeof raw.updatedAt === "string" ? raw.updatedAt : createdAt);
+
   return {
     id,
     name: raw.name ?? "",
@@ -35,9 +63,8 @@ function toProduct(id: string, raw: DocumentData): Product {
     shortDescription: raw.shortDescription ?? "",
     category: (raw.category ?? "Other") as Product["category"],
     collection: raw.collection ?? "",
-    price: typeof raw.price === "number" ? raw.price : 0,
-    compareAtPrice:
-      typeof raw.compareAtPrice === "number" ? raw.compareAtPrice : undefined,
+    price,
+    compareAtPrice,
     cost: typeof raw.cost === "number" ? raw.cost : 0,
     sku: raw.sku ?? "",
     barcode: raw.barcode ?? undefined,
@@ -47,7 +74,7 @@ function toProduct(id: string, raw: DocumentData): Product {
     trackQuantity: raw.trackQuantity !== false,
     allowBackorder: !!raw.allowBackorder,
     status: (raw.status ?? "Active") as Product["status"],
-    images: Array.isArray(raw.images) ? raw.images : [],
+    images,
     variants: Array.isArray(raw.variants)
       ? (raw.variants as ProductVariant[])
       : [],
@@ -57,29 +84,35 @@ function toProduct(id: string, raw: DocumentData): Product {
     rating: typeof raw.rating === "number" ? raw.rating : 0,
     reviewsCount:
       typeof raw.reviewsCount === "number" ? raw.reviewsCount : 0,
-    updatedAt: raw.updatedAt ?? "",
-    createdAt: raw.createdAt ?? "",
+    updatedAt,
+    createdAt,
   };
 }
 
 /** One-shot fetch of the entire catalog (small enough for this brand). */
 export async function listProducts(): Promise<Product[]> {
   const snap = await getDocs(collection(db, "products"));
-  return snap.docs.map((d) => toProduct(d.id, d.data()));
+  const list = snap.docs.map((d) => toProduct(d.id, d.data()));
+  return list.sort((a, b) => new Date(b.updatedAt || b.createdAt || 0).getTime() - new Date(a.updatedAt || a.createdAt || 0).getTime());
 }
 
-/** Live subscription to the catalog. Used by the products list page. */
+/** Live subscription to the catalog. Used by the products and inventory pages. */
 export function useProducts(): { products: Product[]; loading: boolean } {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     const unsub = onSnapshot(
-      query(collection(db, "products"), orderBy("updatedAt", "desc")),
+      collection(db, "products"),
       (snap) => {
-        setProducts(snap.docs.map((d) => toProduct(d.id, d.data())));
+        const list = snap.docs.map((d) => toProduct(d.id, d.data()));
+        list.sort((a, b) => new Date(b.updatedAt || b.createdAt || 0).getTime() - new Date(a.updatedAt || a.createdAt || 0).getTime());
+        setProducts(list);
         setLoading(false);
       },
-      () => setLoading(false),
+      (err) => {
+        console.warn("[products] Real-time listener error:", err);
+        setLoading(false);
+      },
     );
     return () => unsub();
   }, []);

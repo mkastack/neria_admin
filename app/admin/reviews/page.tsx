@@ -8,34 +8,70 @@ import { Drawer } from '@/src/components/ui/Drawer';
 import { Star, CheckCircle2, MessageSquare, ShieldAlert, Send } from 'lucide-react';
 import { Review } from '@/src/lib/types';
 
+import { updateReviewInDB, deleteReviewInDB } from '@/src/lib/firebase/reviews';
+
 export default function ReviewsPage() {
-  const { reviews, setReviews, addToast } = useAdmin();
+  const { reviews, addToast } = useAdmin();
   const [selectedReview, setSelectedReview] = useState<Review | null>(null);
   const [replyInput, setReplyInput] = useState('');
 
   const avgRating = (reviews.reduce((acc, r) => acc + r.rating, 0) / (reviews.length || 1)).toFixed(1);
 
-  const handleSendReply = (e: React.FormEvent) => {
+  const handleSendReply = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedReview || !replyInput.trim()) return;
 
-    setReviews(prev => prev.map(r => r.id === selectedReview.id ? { ...r, adminReply: replyInput.trim() } : r));
-    setReplyInput('');
-    setSelectedReview(null);
-    addToast({
-      type: 'success',
-      title: 'Reply Published ♡',
-      description: 'Official brand response posted under customer review.'
-    });
+    try {
+      await updateReviewInDB(selectedReview.id, { adminReply: replyInput.trim() });
+      setReplyInput('');
+      setSelectedReview(null);
+      addToast({
+        type: 'success',
+        title: 'Reply Published ♡',
+        description: 'Official brand response posted under customer review in Firestore.'
+      });
+    } catch (err) {
+      addToast({
+        type: 'error',
+        title: 'Reply Failed',
+        description: err instanceof Error ? err.message : 'Please try again.'
+      });
+    }
   };
 
-  const handleApprove = (id: string) => {
-    setReviews(prev => prev.map(r => r.id === id ? { ...r, status: 'Approved' } : r));
-    addToast({
-      type: 'success',
-      title: 'Review Approved',
-      description: 'Review is now visible on the product page.'
-    });
+  const handleApprove = async (id: string) => {
+    try {
+      await updateReviewInDB(id, { status: 'Approved' });
+      addToast({
+        type: 'success',
+        title: 'Review Approved ♡',
+        description: 'Review is now visible on the live storefront product page.'
+      });
+    } catch (err) {
+      addToast({
+        type: 'error',
+        title: 'Approval Failed',
+        description: err instanceof Error ? err.message : 'Please try again.'
+      });
+    }
+  };
+
+  const handleDeleteReview = async (id: string) => {
+    if (!confirm('Delete this customer review?')) return;
+    try {
+      await deleteReviewInDB(id);
+      addToast({
+        type: 'info',
+        title: 'Review Removed',
+        description: 'Review was deleted from Firestore.'
+      });
+    } catch (err) {
+      addToast({
+        type: 'error',
+        title: 'Delete Failed',
+        description: err instanceof Error ? err.message : 'Please try again.'
+      });
+    }
   };
 
   return (

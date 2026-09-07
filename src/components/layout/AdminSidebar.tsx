@@ -121,13 +121,12 @@ export function AdminSidebar() {
       ],
     },
     {
-      label: 'Marketing & Community',
+      label: 'Marketing',
       items: [
         { name: 'Campaigns', href: '/admin/campaigns', icon: Megaphone, action: 'campaigns:write' },
         { name: 'Promotions', href: '/admin/promotions', icon: Sparkles, action: 'campaigns:write' },
         { name: 'Store Banners', href: '/admin/banners', icon: ImageIcon, action: 'cms:publish' },
         { name: 'Customer Reviews', href: '/admin/reviews', icon: Star, action: 'reviews:moderate' },
-        { name: 'Neria Girls (UGC)', href: '/admin/community', icon: HeartHandshake, action: 'reviews:moderate' },
         { name: 'Newsletter Club', href: '/admin/newsletter', icon: Mail, action: 'newsletter:write' },
       ],
     },

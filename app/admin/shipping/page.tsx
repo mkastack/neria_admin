@@ -8,9 +8,12 @@ import { Modal } from '@/src/components/ui/Modal';
 import { Truck, MapPin, Plus, Clock, DollarSign, Edit, CheckCircle2 } from 'lucide-react';
 import { ShippingZone } from '@/src/lib/types';
 
+import { createShippingZoneInDB, deleteShippingZoneInDB } from '@/src/lib/firebase/shipping';
+
 export default function ShippingPage() {
-  const { shippingZones, setShippingZones, addToast } = useAdmin();
+  const { shippingZones, addToast } = useAdmin();
   const [isZoneModalOpen, setIsZoneModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [zoneName, setZoneName] = useState('');
   const [stdRate, setStdRate] = useState(30);
   const [expRate, setExpRate] = useState(50);
@@ -40,29 +43,58 @@ export default function ShippingPage() {
     }
   ];
 
-  const handleAddZone = (e: React.FormEvent) => {
+  const handleAddZone = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!zoneName.trim()) return;
 
+    setIsSubmitting(true);
     const newZone: ShippingZone = {
       id: `zone-${Date.now()}`,
-      name: zoneName,
+      name: zoneName.trim(),
       regions: regions.split(',').map(r => r.trim()).filter(Boolean),
-      standardRate: Number(stdRate),
-      expressRate: Number(expRate),
+      standardRate: Number(stdRate) || 0,
+      expressRate: Number(expRate) || 0,
       estimatedDelivery: '1 - 2 Business Days',
       status: 'Active'
     };
 
-    setShippingZones([...shippingZones, newZone]);
-    setIsZoneModalOpen(false);
-    setZoneName('');
-    setRegions('');
-    addToast({
-      type: 'success',
-      title: 'Shipping Zone Added ♡',
-      description: `${zoneName} configured with standard & express rates.`
-    });
+    try {
+      await createShippingZoneInDB(newZone);
+      setIsZoneModalOpen(false);
+      setZoneName('');
+      setRegions('');
+      addToast({
+        type: 'success',
+        title: 'Shipping Zone Saved ♡',
+        description: `${zoneName} configured in Firestore for neria-commerce checkout.`
+      });
+    } catch (err) {
+      addToast({
+        type: 'error',
+        title: 'Could not save zone',
+        description: err instanceof Error ? err.message : 'Please try again.'
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteZone = async (id: string, name: string) => {
+    if (!confirm(`Delete shipping zone "${name}"?`)) return;
+    try {
+      await deleteShippingZoneInDB(id);
+      addToast({
+        type: 'info',
+        title: 'Zone Removed',
+        description: `${name} deleted from Firestore.`
+      });
+    } catch (err) {
+      addToast({
+        type: 'error',
+        title: 'Delete failed',
+        description: err instanceof Error ? err.message : 'Please try again.'
+      });
+    }
   };
 
   return (

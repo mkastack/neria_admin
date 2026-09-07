@@ -178,9 +178,10 @@ export function useOrders(): { orders: Order[]; loading: boolean } {
 
   useEffect(() => {
     const unsub = onSnapshot(
-      query(collection(db, "orders"), orderBy("createdAt", "desc")),
+      collection(db, "orders"),
       async (snap) => {
         const newOrders = snap.docs.map((d) => toOrder(d.id, d.data()));
+        newOrders.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
 
         // Detect new orders (not seen before) after the first load
         if (!isFirstLoad.current) {
@@ -206,9 +207,11 @@ export function useOrders(): { orders: Order[]; loading: boolean } {
 
         setOrders(newOrders);
         setLoading(false);
-
       },
-      () => setLoading(false),
+      (err) => {
+        console.warn("[orders] Real-time listener error:", err);
+        setLoading(false);
+      },
     );
     return () => unsub();
   }, []);

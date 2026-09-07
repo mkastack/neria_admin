@@ -16,6 +16,10 @@ import {
   markNotificationReadInDB,
   markAllNotificationsReadInDB,
 } from "@/src/lib/firebase/notifications";
+import { useGiftCards } from "@/src/lib/firebase/giftCards";
+import { useShippingZones } from "@/src/lib/firebase/shipping";
+import { useReviews } from "@/src/lib/firebase/reviews";
+import { useStaff } from "@/src/lib/firebase/staff";
 import {
   mockGiftCards,
   mockTransactions,
@@ -170,6 +174,10 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   const { customers, loading: customersLoading } = useCustomers();
   const { collections, loading: collectionsLoading } = useCollections();
   const { discounts, loading: discountsLoading } = usePromoCodes();
+  const { giftCards: liveGiftCards, loading: giftCardsLoading } = useGiftCards();
+  const { shippingZones: liveShippingZones, loading: shippingZonesLoading } = useShippingZones();
+  const { reviews: liveReviews, loading: reviewsLoading } = useReviews();
+  const { staff: liveStaff, loading: staffLoading } = useStaff();
   const { logs: activityLogs } = useActivityLogs(50);
   const { categories } = useCategories();
   const { assets: mediaAssets } = useMediaAssets();
@@ -187,17 +195,30 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   const loaderTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Still-mock collections (kept local so existing pages render).
-  const [giftCards, setGiftCards] = useState<GiftCard[]>(mockGiftCards);
   const [transactions, setTransactions] = useState<Transaction[]>(mockTransactions);
   const [refunds, setRefunds] = useState<Refund[]>(mockRefunds);
-  const [shippingZones, setShippingZones] = useState<ShippingZone[]>(mockShippingZones);
   const [deliveryRiders, setDeliveryRiders] = useState<DeliveryRide[]>(mockDeliveryRiders);
   const [returnRequests, setReturnRequests] = useState<ReturnRequest[]>(mockReturnRequests);
   const [campaigns, setCampaigns] = useState<Campaign[]>(mockCampaigns);
-  const [reviews, setReviews] = useState<Review[]>(mockReviews);
   const [communityPosts, setCommunityPosts] = useState<CommunityPost[]>(mockCommunityPosts);
   const [newsletterSubscribers, setNewsletterSubscribers] = useState<NewsletterSubscriber[]>(mockNewsletterSubscribers);
-  const [staff, setStaff] = useState<StaffMember[]>(mockStaff);
+
+  // State with live Firestore fallback
+  const [localGiftCards, setLocalGiftCards] = useState<GiftCard[]>([]);
+  const [localShippingZones, setLocalShippingZones] = useState<ShippingZone[]>([]);
+  const [localReviews, setLocalReviews] = useState<Review[]>([]);
+  const [localStaff, setLocalStaff] = useState<StaffMember[]>([]);
+
+  const giftCards = liveGiftCards.length > 0 ? liveGiftCards : (localGiftCards.length > 0 ? localGiftCards : mockGiftCards);
+  const shippingZones = liveShippingZones.length > 0 ? liveShippingZones : (localShippingZones.length > 0 ? localShippingZones : mockShippingZones);
+  const reviews = liveReviews.length > 0 ? liveReviews : (localReviews.length > 0 ? localReviews : mockReviews);
+  const staff = liveStaff.length > 0 ? liveStaff : (localStaff.length > 0 ? localStaff : mockStaff);
+
+  const setGiftCards: React.Dispatch<React.SetStateAction<GiftCard[]>> = setLocalGiftCards;
+  const setShippingZones: React.Dispatch<React.SetStateAction<ShippingZone[]>> = setLocalShippingZones;
+  const setReviews: React.Dispatch<React.SetStateAction<Review[]>> = setLocalReviews;
+  const setStaff: React.Dispatch<React.SetStateAction<StaffMember[]>> = setLocalStaff;
+
   const { notifications, loading: notificationsLoading } = useAdminNotifications(30);
   // setNotifications kept for context compat — mutations go through Firestore helpers
   const setNotifications: React.Dispatch<React.SetStateAction<NotificationItem[]>> = () => {};
