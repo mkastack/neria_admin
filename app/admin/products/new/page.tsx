@@ -15,7 +15,7 @@ import { uploadMedia } from '@/src/lib/firebase/media';
 
 export default function AddProductPage() {
   const router = useRouter();
-  const { addToast } = useAdmin();
+  const { addToast, categories } = useAdmin();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -23,8 +23,7 @@ export default function AddProductPage() {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [shortDescription, setShortDescription] = useState('');
-  const [category, setCategory] = useState<'Dresses' | 'Tops' | 'Sets' | 'Accessories' | 'Hoodies' | 'Other'>('Hoodies');
-  const [collection, setCollection] = useState('Core Lookbook');
+  const [category, setCategory] = useState('');
   const [status, setStatus] = useState<'Active' | 'Draft' | 'Archived'>('Active');
   
   // Pricing
@@ -73,6 +72,8 @@ export default function AddProductPage() {
       stock: 10
     }))
   );
+
+  const selectedCategorySlug = category || categories[0]?.slug || '';
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -139,6 +140,14 @@ export default function AddProductPage() {
       });
       return;
     }
+    if (!selectedCategorySlug) {
+      addToast({
+        type: 'error',
+        title: 'Category Required',
+        description: 'Create or select a category before saving this product.',
+      });
+      return;
+    }
 
     const slug = name.toLowerCase().replace(/ /g, '-').replace(/[^a-z0-9-]/g, '');
 
@@ -147,8 +156,8 @@ export default function AddProductPage() {
       slug,
       description: description.trim(),
       shortDescription: shortDescription.trim(),
-      category,
-      collection,
+      category: selectedCategorySlug,
+      categoryName: categories.find((item) => item.slug === selectedCategorySlug)?.name,
       price: Number(price) || 0,
       compareAtPrice: Number(comparePrice) || undefined,
       cost: Number(cost) || 0,
@@ -169,7 +178,7 @@ export default function AddProductPage() {
         stock: v.stock,
         status: v.stock > 0 ? 'In Stock' : 'Out of Stock'
       })),
-      tags: ['New Arrival', collection],
+      tags: ['New Arrival'],
       salesCount: 0,
       revenue: 0,
       rating: 5.0,
@@ -517,40 +526,23 @@ export default function AddProductPage() {
             </div>
           </div>
 
-          {/* Category & Collection Assignment */}
+          {/* Category Assignment */}
           <div className="bg-white p-6 rounded-3xl border border-[#F2F3F5] shadow-xs space-y-4">
             <h3 className="text-base font-bold text-[#263550]">Organization</h3>
 
             <div>
               <label className="block text-xs font-bold text-[#263550] mb-1">Apparel Category</label>
               <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value as any)}
+                value={selectedCategorySlug}
+                onChange={(e) => setCategory(e.target.value)}
                 className="w-full px-3.5 py-2 rounded-xl border border-[#DDE1E7] text-xs text-[#263550] bg-white outline-none"
               >
-                <option value="Hoodies">Hoodies</option>
-                <option value="Dresses">Dresses</option>
-                <option value="Tops">Tops</option>
-                <option value="Accessories">Accessories</option>
-                <option value="Sets">Sets & Loungewear</option>
-                <option value="Other">Other</option>
+                {categories.length > 0 ? categories.map((item) => (
+                  <option key={item.slug} value={item.slug}>{item.name}</option>
+                )) : <option value="hoodies">Hoodies</option>}
               </select>
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-[#263550] mb-1">Collection</label>
-              <select
-                value={collection}
-                onChange={(e) => setCollection(e.target.value)}
-                className="w-full px-3.5 py-2 rounded-xl border border-[#DDE1E7] text-xs text-[#263550] bg-white outline-none"
-              >
-                <option value="Bunny Love">Bunny Love</option>
-                <option value="Strawberry Girl">Strawberry Girl</option>
-                <option value="Soft Girl">Soft Girl</option>
-                <option value="Bow Obsessed">Bow Obsessed</option>
-                <option value="Cozy Bunny">Cozy Bunny</option>
-              </select>
-            </div>
           </div>
 
           {/* Inventory Controls */}

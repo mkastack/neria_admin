@@ -15,7 +15,6 @@ import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell
 } from 'recharts';
-import { mockRevenueTrend, mockSalesByCategory } from '@/src/lib/mock-data';
 
 export default function AdminDashboardPage() {
   const { orders, products, customers, fulfillOrder, addToast } = useAdmin();
@@ -77,13 +76,12 @@ export default function AdminDashboardPage() {
     const hasAnyOrders = buckets.some((b) => b.revenue > 0 || b.orders > 0);
     if (hasAnyOrders) return buckets;
 
-    // Otherwise show realistic baseline scaled to current catalog so chart renders gracefully
-    return mockRevenueTrend;
+    return buckets;
   }, [orders, chartTimeframe]);
 
   const periodRevenue = revenueTrend.reduce((sum, b) => sum + b.revenue, 0);
   const periodOrders = revenueTrend.reduce((sum, b) => sum + b.orders, 0);
-  const periodAOV = periodOrders > 0 ? Math.round(periodRevenue / periodOrders) : (totalOrders > 0 ? Math.round(avgOrderValue) : 445);
+  const periodAOV = periodOrders > 0 ? Math.round(periodRevenue / periodOrders) : 0;
 
   // ── Dynamic Real-time Sales by Category ──
   const { salesByCategory, topCategory } = React.useMemo(() => {

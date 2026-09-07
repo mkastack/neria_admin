@@ -2,6 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import { useAdmin } from '@/src/lib/context/AdminContext';
+import { ConfirmModal } from '@/src/components/ui/ConfirmModal';
 import { useMediaAssets, uploadMedia, deleteMedia } from '@/src/lib/firebase/media';
 import { Film, Image as ImageIcon, UploadCloud, Search, Trash2, Copy, Loader2, Sparkles } from 'lucide-react';
 
@@ -19,6 +20,7 @@ export default function MediaLibraryPage() {
   const [activeTab, setActiveTab] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [isUploading, setIsUploading] = useState(false);
+  const [pendingDelete, setPendingDelete] = useState<{ id: string; url: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleCopyUrl = (url: string) => {
@@ -30,8 +32,9 @@ export default function MediaLibraryPage() {
     });
   };
 
-  const handleDelete = async (id: string, url: string) => {
-    if (!confirm('Are you sure you want to delete this media asset?')) return;
+  const handleDelete = async () => {
+    if (!pendingDelete) return;
+    const { id, url } = pendingDelete;
     try {
       await deleteMedia(id, url);
       addToast({
@@ -45,6 +48,8 @@ export default function MediaLibraryPage() {
         title: 'Delete Failed',
         description: err.message || 'Could not delete media.'
       });
+    } finally {
+      setPendingDelete(null);
     }
   };
 
@@ -222,7 +227,7 @@ export default function MediaLibraryPage() {
                     <Copy className="w-3.5 h-3.5" />
                   </button>
                   <button
-                    onClick={() => handleDelete(item.id, item.url)}
+                    onClick={() => setPendingDelete({ id: item.id, url: item.url })}
                     className="p-1.5 rounded-lg bg-white/90 text-[#B42318] hover:bg-[#FEF3F2] shadow-xs cursor-pointer"
                     title="Delete"
                   >
@@ -247,6 +252,14 @@ export default function MediaLibraryPage() {
           ))}
         </div>
       )}
+      <ConfirmModal
+        isOpen={pendingDelete !== null}
+        title="Delete media asset?"
+        message="This asset will be removed from the media library and storage."
+        confirmLabel="Delete Asset"
+        onCancel={() => setPendingDelete(null)}
+        onConfirm={handleDelete}
+      />
     </div>
   );
 }

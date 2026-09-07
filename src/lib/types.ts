@@ -80,8 +80,8 @@ export interface Product {
   slug: string;
   description: string;
   shortDescription: string;
-  category: 'Dresses' | 'Tops' | 'Sets' | 'Accessories' | 'Hoodies' | 'Other';
-  collection: string;
+  category: string;
+  categoryName?: string;
   price: number;
   compareAtPrice?: number;
   cost: number;
@@ -101,21 +101,6 @@ export interface Product {
   reviewsCount: number;
   updatedAt: string;
   createdAt: string;
-}
-
-export interface Collection {
-  id: string;
-  name: string;
-  slug: string;
-  description: string;
-  coverImage: string;
-  bannerImage: string;
-  productsCount: number;
-  status: 'Active' | 'Draft' | 'Scheduled';
-  sales: number;
-  revenue: number;
-  updatedAt: string;
-  productIds: string[];
 }
 
 export interface Customer {

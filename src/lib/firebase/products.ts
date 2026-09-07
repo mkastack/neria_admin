@@ -55,14 +55,18 @@ function toProduct(id: string, raw: DocumentData): Product {
     raw.updatedAt?.toDate?.()?.toISOString?.() ??
     (typeof raw.updatedAt === "string" ? raw.updatedAt : createdAt);
 
+  const category = typeof raw.category === "string"
+    ? raw.category.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")
+    : "other";
+
   return {
     id,
     name: raw.name ?? "",
     slug: raw.slug ?? "",
     description: raw.description ?? "",
     shortDescription: raw.shortDescription ?? "",
-    category: (raw.category ?? "Other") as Product["category"],
-    collection: raw.collection ?? "",
+    category,
+    categoryName: typeof raw.categoryName === "string" ? raw.categoryName : undefined,
     price,
     compareAtPrice,
     cost: typeof raw.cost === "number" ? raw.cost : 0,
@@ -157,8 +161,10 @@ export async function getProductBySlug(
  */
 export async function createProduct(p: Omit<Product, "id">): Promise<string> {
   const ref = doc(collection(db, "products"));
+  const { categoryName, ...productData } = p;
   await setDoc(ref, {
-    ...p,
+    ...productData,
+    ...(categoryName !== undefined ? { categoryName } : {}),
     priceCents: Math.round(p.price * 100), // dollars → cents for the storefront
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
@@ -180,14 +186,17 @@ export async function updateProduct(
   id: string,
   updates: Partial<Product>,
 ): Promise<void> {
+  const cleanUpdates = Object.fromEntries(
+    Object.entries(updates).filter(([, value]) => value !== undefined),
+  );
+
   await setDoc(
     doc(db, "products", id),
     {
-      ...updates,
-      priceCents:
-        typeof updates.price === "number"
-          ? Math.round(updates.price * 100)
-          : undefined,
+      ...cleanUpdates,
+      ...(typeof updates.price === "number"
+        ? { priceCents: Math.round(updates.price * 100) }
+        : {}),
       updatedAt: serverTimestamp(),
     },
     { merge: true },

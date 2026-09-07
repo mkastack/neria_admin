@@ -5,6 +5,7 @@ import { useAdmin } from '@/src/lib/context/AdminContext';
 import { StatCard } from '@/src/components/ui/StatCard';
 import { StatusBadge } from '@/src/components/ui/StatusBadge';
 import { Modal } from '@/src/components/ui/Modal';
+import { ConfirmModal } from '@/src/components/ui/ConfirmModal';
 import { Gift, Plus, Sparkles, DollarSign, Copy, CheckCircle2 } from 'lucide-react';
 import { GiftCard } from '@/src/lib/types';
 
@@ -17,6 +18,7 @@ export default function GiftCardsPage() {
   const [recipientName, setRecipientName] = useState('');
   const [recipientEmail, setRecipientEmail] = useState('');
   const [initialValue, setInitialValue] = useState<number>(350);
+  const [pendingDelete, setPendingDelete] = useState<{ id: string; code: string } | null>(null);
 
   const totalIssued = giftCards.reduce((acc, g) => acc + g.initialValue, 0);
   const totalBalance = giftCards.reduce((acc, g) => acc + g.balance, 0);
@@ -58,8 +60,9 @@ export default function GiftCardsPage() {
     }
   };
 
-  const handleDeleteCard = async (id: string, code: string) => {
-    if (!confirm(`Delete gift card ${code}?`)) return;
+  const handleDeleteCard = async () => {
+    if (!pendingDelete) return;
+    const { id, code } = pendingDelete;
     try {
       await deleteGiftCardInDB(id);
       addToast({
@@ -73,6 +76,8 @@ export default function GiftCardsPage() {
         title: 'Delete Failed',
         description: err instanceof Error ? err.message : 'Please try again.'
       });
+    } finally {
+      setPendingDelete(null);
     }
   };
 
@@ -225,6 +230,14 @@ export default function GiftCardsPage() {
           </div>
         </form>
       </Modal>
+      <ConfirmModal
+        isOpen={pendingDelete !== null}
+        title="Delete gift card?"
+        message={pendingDelete ? `Delete gift card ${pendingDelete.code}?` : ''}
+        confirmLabel="Delete Gift Card"
+        onCancel={() => setPendingDelete(null)}
+        onConfirm={handleDeleteCard}
+      />
     </div>
   );
 }

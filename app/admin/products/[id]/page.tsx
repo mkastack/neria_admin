@@ -17,7 +17,7 @@ import { db } from '@/src/lib/firebase/client';
 export default function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const router = useRouter();
-  const { addToast } = useAdmin();
+  const { addToast, categories } = useAdmin();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [isLoading, setIsLoading] = useState(true);
@@ -29,8 +29,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
   const [slug, setSlug] = useState('');
   const [description, setDescription] = useState('');
   const [shortDescription, setShortDescription] = useState('');
-  const [category, setCategory] = useState<'Dresses' | 'Tops' | 'Sets' | 'Accessories' | 'Hoodies' | 'Other'>('Hoodies');
-  const [collection, setCollection] = useState('Core Lookbook');
+  const [category, setCategory] = useState('');
   const [status, setStatus] = useState<'Active' | 'Draft' | 'Archived'>('Active');
 
   // Pricing
@@ -51,6 +50,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
 
   // Variants
   const [variants, setVariants] = useState<Product['variants']>([]);
+  const selectedCategorySlug = category || categories[0]?.slug || '';
 
   // Real-time listener for this specific product
   useEffect(() => {
@@ -78,8 +78,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
         setSlug(data.slug || '');
         setDescription(data.description || '');
         setShortDescription(data.shortDescription || '');
-        setCategory(data.category || 'Hoodies');
-        setCollection(data.collection || 'Core Lookbook');
+        setCategory(typeof data.category === 'string' ? data.category.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') : 'hoodies');
         setStatus(data.status || 'Active');
         setPrice(pPrice);
         setComparePrice(pCompare);
@@ -170,13 +169,22 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
 
     setIsSaving(true);
     try {
+      if (!selectedCategorySlug) {
+        addToast({
+          type: 'error',
+          title: 'Category Required',
+          description: 'Create or select a category before saving this product.',
+        });
+        setIsSaving(false);
+        return;
+      }
       await updateProduct(resolvedParams.id, {
         name: name.trim(),
         slug: slug.trim() || name.toLowerCase().replace(/ /g, '-').replace(/[^a-z0-9-]/g, ''),
         description: description.trim(),
         shortDescription: shortDescription.trim(),
-        category,
-        collection,
+        category: selectedCategorySlug,
+        categoryName: categories.find((item) => item.slug === selectedCategorySlug)?.name,
         status,
         price: Number(price) || 0,
         compareAtPrice: Number(comparePrice) || undefined,
@@ -429,29 +437,16 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-[#263550]">Category</label>
               <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value as any)}
+                value={selectedCategorySlug}
+                onChange={(e) => setCategory(e.target.value)}
                 className="w-full px-3.5 py-2.5 rounded-xl border border-[#DDE1E7] text-xs font-medium focus:outline-none focus:border-[#FF4FA3]"
               >
-                <option value="Hoodies">Hoodies</option>
-                <option value="Dresses">Dresses</option>
-                <option value="Tops">Tops</option>
-                <option value="Sets">Sets</option>
-                <option value="Accessories">Accessories</option>
-                <option value="Other">Other</option>
+                {categories.length > 0 ? categories.map((item) => (
+                  <option key={item.slug} value={item.slug}>{item.name}</option>
+                )) : <option value="hoodies">Hoodies</option>}
               </select>
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-[#263550]">Collection</label>
-              <input
-                type="text"
-                value={collection}
-                onChange={(e) => setCollection(e.target.value)}
-                placeholder="e.g. Summer Lookbook"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-[#DDE1E7] text-xs focus:outline-none focus:border-[#FF4FA3]"
-              />
-            </div>
           </div>
 
           {/* Pricing */}

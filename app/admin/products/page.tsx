@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useAdmin } from '@/src/lib/context/AdminContext';
 import { StatusBadge } from '@/src/components/ui/StatusBadge';
 import { EmptyState } from '@/src/components/ui/EmptyState';
+import { ConfirmModal } from '@/src/components/ui/ConfirmModal';
 import {
   Search, Plus, Download, LayoutGrid, Table, Eye,
   Edit, Trash2, Tag, Layers, CheckCircle2, Boxes
@@ -13,13 +14,15 @@ import { Product } from '@/src/lib/types';
 import { deleteProduct } from '@/src/lib/firebase/products';
 
 export default function ProductsPage() {
-  const { products, addToast } = useAdmin();
+  const { products, categories, addToast } = useAdmin();
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
   const [activeTab, setActiveTab] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [pendingDelete, setPendingDelete] = useState<{ id: string; name: string } | null>(null);
 
-  const categories = ['All', 'Hoodies', 'Dresses', 'Tops', 'Accessories', 'Sets'];
+  const categoryFilters = [{ slug: 'All', name: 'All' }, ...categories];
+  const categoryNames = Object.fromEntries(categories.map((category) => [category.slug, category.name]));
 
   const filteredProducts = products.filter((p) => {
     if (activeTab === 'Active' && p.status !== 'Active') return false;
@@ -36,8 +39,9 @@ export default function ProductsPage() {
     return true;
   });
 
-  const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
+  const handleDelete = async () => {
+    if (!pendingDelete) return;
+    const { id, name } = pendingDelete;
     try {
       await deleteProduct(id);
       addToast({
@@ -51,6 +55,8 @@ export default function ProductsPage() {
         title: 'Delete failed',
         description: err instanceof Error ? err.message : 'Please try again.',
       });
+    } finally {
+      setPendingDelete(null);
     }
   };
 
@@ -149,17 +155,17 @@ export default function ProductsPage() {
           </div>
 
           <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0">
-            {categories.map((cat) => (
+            {categoryFilters.map((cat) => (
               <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
+                key={cat.slug}
+                onClick={() => setSelectedCategory(cat.slug)}
                 className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap cursor-pointer transition-colors ${
-                  selectedCategory === cat
+                  selectedCategory === cat.slug
                     ? 'bg-[#263550] text-white'
                     : 'bg-[#F8F8FA] text-[#667085] hover:bg-[#FFF4F8] hover:text-[#FF4FA3]'
                 }`}
               >
-                {cat}
+                {cat.name}
               </button>
             ))}
           </div>
@@ -186,7 +192,6 @@ export default function ProductsPage() {
                   <th className="py-4 px-3">Status</th>
                   <th className="py-4 px-3">Stock Units</th>
                   <th className="py-4 px-3">Category</th>
-                  <th className="py-4 px-3">Collection</th>
                   <th className="py-4 px-3">Price</th>
                   <th className="py-4 px-3">Sales</th>
                   <th className="py-4 px-4 text-right">Actions</th>
@@ -226,12 +231,7 @@ export default function ProductsPage() {
                         {product.stock} in stock
                       </span>
                     </td>
-                    <td className="py-3.5 px-3 text-[#667085]">{product.category}</td>
-                    <td className="py-3.5 px-3 text-[#667085]">
-                      <span className="px-2 py-0.5 rounded-md bg-[#FFF4F8] text-[#FF4FA3] text-[11px] font-medium">
-                        {product.collection}
-                      </span>
-                    </td>
+                    <td className="py-3.5 px-3 text-[#667085]">{categoryNames[product.category] ?? product.category}</td>
                     <td className="py-3.5 px-3 font-bold text-[#263550]">
                       $ {product.price}
                     </td>
@@ -257,7 +257,7 @@ export default function ProductsPage() {
                           <Edit className="w-3.5 h-3.5" />
                         </Link>
                         <button
-                          onClick={() => handleDelete(product.id, product.name)}
+                          onClick={() => setPendingDelete({ id: product.id, name: product.name })}
                           className="p-1.5 rounded-lg text-[#98A0AE] hover:text-[#B42318] hover:bg-[#FEF3F2] transition-colors cursor-pointer"
                           title="Delete Product"
                         >
@@ -288,9 +288,6 @@ export default function ProductsPage() {
                 <div className="absolute top-3 right-3">
                   <StatusBadge status={product.status} />
                 </div>
-                <span className="absolute bottom-3 left-3 px-2.5 py-1 rounded-xl bg-white/90 backdrop-blur-md text-[11px] font-bold text-[#FF4FA3]">
-                  {product.collection}
-                </span>
               </div>
 
               <div className="p-4 space-y-2">
@@ -306,7 +303,7 @@ export default function ProductsPage() {
                 <p className="text-[11px] text-[#98A0AE]">{product.salesCount} total orders</p>
 
                 <div className="pt-3 border-t border-[#F2F3F5] flex items-center justify-between">
-                  <span className="text-[11px] text-[#667085]">{product.category}</span>
+                  <span className="text-[11px] text-[#667085]">{categoryNames[product.category] ?? product.category}</span>
                   <div className="flex items-center gap-1">
                     <a
                       href={`https://neria-commerce.vercel.app/product/${product.slug || product.id}`}
@@ -325,7 +322,7 @@ export default function ProductsPage() {
                       <Edit className="w-3.5 h-3.5" />
                     </Link>
                     <button
-                      onClick={() => handleDelete(product.id, product.name)}
+                      onClick={() => setPendingDelete({ id: product.id, name: product.name })}
                       className="p-1.5 rounded-lg text-[#98A0AE] hover:text-[#B42318] hover:bg-[#FEF3F2]"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -337,6 +334,14 @@ export default function ProductsPage() {
           ))}
         </div>
       )}
+      <ConfirmModal
+        isOpen={pendingDelete !== null}
+        title="Delete product?"
+        message={pendingDelete ? `Delete “${pendingDelete.name}”? This cannot be undone.` : ''}
+        confirmLabel="Delete Product"
+        onCancel={() => setPendingDelete(null)}
+        onConfirm={handleDelete}
+      />
     </div>
   );
 }

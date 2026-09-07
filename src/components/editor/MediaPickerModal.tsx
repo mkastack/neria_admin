@@ -19,6 +19,7 @@ export function MediaPickerModal() {
   const [uploadFolder, setUploadFolder] = useState('Campaigns');
   const [showUploadForm, setShowUploadForm] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!isMediaPickerOpen) return null;
@@ -42,6 +43,7 @@ export function MediaPickerModal() {
   const handleUploadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!stagedFile) return;
+    setUploadError(null);
     setIsUploading(true);
     try {
       const asset = await uploadMedia({
@@ -59,7 +61,7 @@ export function MediaPickerModal() {
       if (fileInputRef.current) fileInputRef.current.value = '';
       setShowUploadForm(false);
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Upload failed. Please try again.');
+      setUploadError(err instanceof Error ? err.message : 'Upload failed. Please try again.');
     } finally {
       setIsUploading(false);
     }
@@ -107,6 +109,11 @@ export function MediaPickerModal() {
         {showUploadForm ? (
           <div className="p-6 overflow-y-auto">
             <form onSubmit={handleUploadSubmit} className="space-y-4 max-w-lg mx-auto">
+              {uploadError && (
+                <p role="alert" className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs font-medium text-red-700">
+                  {uploadError}
+                </p>
+              )}
               <div className="p-6 border-2 border-dashed border-[#FFD8EA] rounded-2xl bg-[#FFF4F8]/50 text-center">
                 <UploadCloud className="w-10 h-10 mx-auto text-[#FF4FA3] mb-2" />
                 <h4 className="text-sm font-bold text-[#263550]">Upload Website Asset</h4>

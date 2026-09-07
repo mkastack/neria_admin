@@ -8,7 +8,7 @@ import { Modal } from '@/src/components/ui/Modal';
 import { Truck, MapPin, Plus, Clock, DollarSign, Edit, CheckCircle2 } from 'lucide-react';
 import { ShippingZone } from '@/src/lib/types';
 
-import { createShippingZoneInDB, deleteShippingZoneInDB } from '@/src/lib/firebase/shipping';
+import { createShippingZoneInDB } from '@/src/lib/firebase/shipping';
 
 export default function ShippingPage() {
   const { shippingZones, addToast } = useAdmin();
@@ -76,24 +76,6 @@ export default function ShippingPage() {
       });
     } finally {
       setIsSubmitting(false);
-    }
-  };
-
-  const handleDeleteZone = async (id: string, name: string) => {
-    if (!confirm(`Delete shipping zone "${name}"?`)) return;
-    try {
-      await deleteShippingZoneInDB(id);
-      addToast({
-        type: 'info',
-        title: 'Zone Removed',
-        description: `${name} deleted from Firestore.`
-      });
-    } catch (err) {
-      addToast({
-        type: 'error',
-        title: 'Delete failed',
-        description: err instanceof Error ? err.message : 'Please try again.'
-      });
     }
   };
 

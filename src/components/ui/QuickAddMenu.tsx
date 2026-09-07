@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { Plus, ShoppingBag, Layers, Tag, Megaphone, UserPlus, Image as ImageIcon } from 'lucide-react';
+import { Plus, ShoppingBag, Tag, Megaphone, UserPlus, Image as ImageIcon } from 'lucide-react';
 
 export function QuickAddMenu() {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,7 +20,6 @@ export function QuickAddMenu() {
 
   const items = [
     { label: 'Add Product', icon: ShoppingBag, href: '/admin/products/new', desc: 'Create a new fashion SKU or apparel' },
-    { label: 'Create Collection', icon: Layers, href: '/admin/collections', desc: 'Curate products into a lookbook' },
     { label: 'Create Discount', icon: Tag, href: '/admin/discounts', desc: 'Set up coupon codes or sales' },
     { label: 'Create Campaign', icon: Megaphone, href: '/admin/campaigns', desc: 'Launch email or promo banners' },
     { label: 'Add Staff Member', icon: UserPlus, href: '/admin/staff', desc: 'Invite manager or team' },

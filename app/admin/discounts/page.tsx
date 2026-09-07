@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useAdmin } from '@/src/lib/context/AdminContext';
 import { StatusBadge } from '@/src/components/ui/StatusBadge';
 import { Modal } from '@/src/components/ui/Modal';
+import { ConfirmModal } from '@/src/components/ui/ConfirmModal';
 import {
   Tag, Plus, Percent, DollarSign, Truck, Sparkles,
   Calendar, CheckCircle2, Copy, Scissors, Trash2, Power, Loader2
@@ -22,6 +23,7 @@ export default function DiscountsPage() {
   const [value, setValue] = useState<number>(10);
   const [minSpend, setMinSpend] = useState<number>(200);
   const [usageLimit, setUsageLimit] = useState<number>(500);
+  const [pendingDeleteCode, setPendingDeleteCode] = useState<string | null>(null);
 
   const handleCreateDiscount = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,8 +85,9 @@ export default function DiscountsPage() {
     }
   };
 
-  const handleDeleteCode = async (discCode: string) => {
-    if (!confirm(`Permanently delete discount code ${discCode}?`)) return;
+  const handleDeleteCode = async () => {
+    if (!pendingDeleteCode) return;
+    const discCode = pendingDeleteCode;
     try {
       await deletePromoCode(discCode);
       addToast({
@@ -98,6 +101,8 @@ export default function DiscountsPage() {
         title: 'Delete Failed',
         description: err instanceof Error ? err.message : 'Could not delete promo code.'
       });
+    } finally {
+      setPendingDeleteCode(null);
     }
   };
 
@@ -182,7 +187,7 @@ export default function DiscountsPage() {
                     <span>Copy</span>
                   </button>
                   <button
-                    onClick={() => handleDeleteCode(disc.code)}
+                    onClick={() => setPendingDeleteCode(disc.code)}
                     className="p-1.5 rounded-lg text-[#98A0AE] hover:text-[#B42318] hover:bg-[#FEF3F2] transition-colors cursor-pointer"
                     title="Delete discount"
                   >
@@ -299,6 +304,14 @@ export default function DiscountsPage() {
           </form>
         </Modal>
       )}
+      <ConfirmModal
+        isOpen={pendingDeleteCode !== null}
+        title="Delete discount code?"
+        message={pendingDeleteCode ? `Permanently delete ${pendingDeleteCode}?` : ''}
+        confirmLabel="Delete Code"
+        onCancel={() => setPendingDeleteCode(null)}
+        onConfirm={handleDeleteCode}
+      />
     </div>
   );
 }

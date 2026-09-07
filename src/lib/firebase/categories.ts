@@ -3,11 +3,14 @@
 import {
   collection,
   doc,
+  getDocs,
   onSnapshot,
   orderBy,
   query,
   serverTimestamp,
   setDoc,
+  where,
+  writeBatch,
   type DocumentData,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
@@ -18,6 +21,7 @@ export interface CategoryDoc {
   id: string;
   name: string;
   slug: string;
+  description?: string;
   image: string;
   itemCount: number;
   badge?: string;
@@ -31,6 +35,7 @@ function toCategory(id: string, raw: DocumentData): CategoryDoc {
     id,
     name: typeof raw.name === "string" ? raw.name : id,
     slug: typeof raw.slug === "string" ? raw.slug : id,
+    description: typeof raw.description === "string" ? raw.description : undefined,
     image: typeof raw.image === "string" ? raw.image : "",
     itemCount: typeof raw.itemCount === "number" ? raw.itemCount : 0,
     badge: typeof raw.badge === "string" ? raw.badge : undefined,
@@ -65,6 +70,7 @@ export async function upsertCategory(c: CategoryDoc): Promise<void> {
     {
       name: c.name,
       slug: c.slug,
+      description: c.description ?? "",
       image: c.image,
       itemCount: c.itemCount,
       badge: c.badge ?? null,
@@ -74,6 +80,27 @@ export async function upsertCategory(c: CategoryDoc): Promise<void> {
     },
     { merge: true },
   );
+}
+
+export async function renameCategory(oldSlug: string, category: CategoryDoc): Promise<void> {
+  await upsertCategory(category);
+  if (oldSlug === category.slug) return;
+
+  const products = await getDocs(
+    query(collection(db, "products"), where("category", "==", oldSlug)),
+  );
+  if (!products.empty) {
+    const batch = writeBatch(db);
+    products.docs.forEach((product) => {
+      batch.update(product.ref, {
+        category: category.slug,
+        categoryName: category.name,
+      });
+    });
+    await batch.commit();
+  }
+
+  await deleteCategory(oldSlug);
 }
 
 export async function deleteCategory(slug: string): Promise<void> {

@@ -10,7 +10,7 @@ import { signOutUser } from '@/src/lib/firebase/auth';
 import { can, type Action, NAV_PERMISSIONS } from '@/src/lib/rbac';
 import { BunnyMascot } from '../ui/BunnyMascot';
 import {
-  LayoutDashboard, ShoppingBag, ShoppingCart, Layers, Boxes, Users,
+  LayoutDashboard, ShoppingBag, ShoppingCart, Boxes, Users,
   Tag, Gift, CreditCard, ArrowLeftRight, RotateCcw, Truck, MapPin,
   Undo2, Megaphone, Sparkles, Image as ImageIcon, Star, HeartHandshake,
   Mail, LayoutTemplate, Film, FileText, Menu as MenuIcon, BarChart3,
@@ -102,7 +102,7 @@ export function AdminSidebar() {
       items: [
         { name: 'Orders', href: '/admin/orders', icon: ShoppingCart, badge: unfulfilledOrders > 0 ? unfulfilledOrders : undefined, action: 'orders:read' },
         { name: 'Products', href: '/admin/products', icon: ShoppingBag, action: 'products:read' },
-        { name: 'Collections', href: '/admin/collections', icon: Layers, action: 'collections:read' },
+        { name: 'Product Categories', href: '/admin/categories', icon: Tag, action: 'categories:write' },
         { name: 'Inventory', href: '/admin/inventory', icon: Boxes, badge: lowStockCount > 0 ? lowStockCount : undefined, action: 'products:read' },
         { name: 'Customers', href: '/admin/customers', icon: Users, action: 'customers:read' },
         { name: 'Discounts', href: '/admin/discounts', icon: Tag, action: 'discounts:read' },

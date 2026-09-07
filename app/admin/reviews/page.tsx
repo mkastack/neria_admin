@@ -8,7 +8,7 @@ import { Drawer } from '@/src/components/ui/Drawer';
 import { Star, CheckCircle2, MessageSquare, ShieldAlert, Send } from 'lucide-react';
 import { Review } from '@/src/lib/types';
 
-import { updateReviewInDB, deleteReviewInDB } from '@/src/lib/firebase/reviews';
+import { updateReviewInDB } from '@/src/lib/firebase/reviews';
 
 export default function ReviewsPage() {
   const { reviews, addToast } = useAdmin();
@@ -51,24 +51,6 @@ export default function ReviewsPage() {
       addToast({
         type: 'error',
         title: 'Approval Failed',
-        description: err instanceof Error ? err.message : 'Please try again.'
-      });
-    }
-  };
-
-  const handleDeleteReview = async (id: string) => {
-    if (!confirm('Delete this customer review?')) return;
-    try {
-      await deleteReviewInDB(id);
-      addToast({
-        type: 'info',
-        title: 'Review Removed',
-        description: 'Review was deleted from Firestore.'
-      });
-    } catch (err) {
-      addToast({
-        type: 'error',
-        title: 'Delete Failed',
         description: err instanceof Error ? err.message : 'Please try again.'
       });
     }

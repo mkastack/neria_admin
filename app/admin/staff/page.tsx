@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useAdmin } from '@/src/lib/context/AdminContext';
 import { StatusBadge } from '@/src/components/ui/StatusBadge';
 import { Modal } from '@/src/components/ui/Modal';
+import { ConfirmModal } from '@/src/components/ui/ConfirmModal';
 import { ShieldCheck, UserPlus, Mail, Shield, Trash2, CheckCircle2 } from 'lucide-react';
 import { StaffMember } from '@/src/lib/types';
 
@@ -16,6 +17,7 @@ export default function StaffPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [role, setRole] = useState<'Store Manager' | 'Order Manager' | 'Inventory Manager' | 'Customer Support'>('Store Manager');
+  const [pendingRemove, setPendingRemove] = useState<{ id: string; name: string } | null>(null);
 
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,8 +50,9 @@ export default function StaffPage() {
     }
   };
 
-  const handleRemove = async (id: string, memberName: string) => {
-    if (!confirm(`Revoke dashboard access for ${memberName}?`)) return;
+  const handleRemove = async () => {
+    if (!pendingRemove) return;
+    const { id, name: memberName } = pendingRemove;
     try {
       await removeStaffInDB(id);
       addToast({
@@ -63,6 +66,8 @@ export default function StaffPage() {
         title: 'Revoke Failed',
         description: err instanceof Error ? err.message : 'Please try again.'
       });
+    } finally {
+      setPendingRemove(null);
     }
   };
 
@@ -125,7 +130,7 @@ export default function StaffPage() {
                   </td>
                   <td className="py-3.5 px-4 text-right">
                     <button
-                      onClick={() => handleRemove(st.id, st.name)}
+                      onClick={() => setPendingRemove({ id: st.id, name: st.name })}
                       title="Revoke Access"
                       className="p-1.5 rounded-lg text-[#98A0AE] hover:text-[#B42318] hover:bg-[#FEF3F2] transition-colors cursor-pointer"
                     >
@@ -202,6 +207,14 @@ export default function StaffPage() {
           </div>
         </form>
       </Modal>
+      <ConfirmModal
+        isOpen={pendingRemove !== null}
+        title="Revoke dashboard access?"
+        message={pendingRemove ? `${pendingRemove.name} will no longer be able to access the dashboard.` : ''}
+        confirmLabel="Revoke Access"
+        onCancel={() => setPendingRemove(null)}
+        onConfirm={handleRemove}
+      />
     </div>
   );
 }

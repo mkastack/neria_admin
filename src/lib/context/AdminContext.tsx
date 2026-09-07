@@ -6,10 +6,10 @@ import { useUserProfile } from "@/src/lib/firebase/users";
 import { useProducts } from "@/src/lib/firebase/products";
 import { useOrders } from "@/src/lib/firebase/orders";
 import { useCustomers } from "@/src/lib/firebase/customers";
-import { useCollections } from "@/src/lib/firebase/collections";
 import { usePromoCodes } from "@/src/lib/firebase/promoCodes";
 import { useActivityLogs } from "@/src/lib/firebase/activity";
 import { useCategories } from "@/src/lib/firebase/categories";
+import type { CategoryDoc } from "@/src/lib/firebase/categories";
 import { useMediaAssets } from "@/src/lib/firebase/media";
 import {
   useAdminNotifications,
@@ -21,27 +21,12 @@ import { useShippingZones } from "@/src/lib/firebase/shipping";
 import { useReviews } from "@/src/lib/firebase/reviews";
 import { useStaff } from "@/src/lib/firebase/staff";
 import {
-  mockGiftCards,
-  mockTransactions,
-  mockRefunds,
-  mockShippingZones,
-  mockDeliveryRiders,
-  mockReturnRequests,
-  mockCampaigns,
-  mockReviews,
-  mockCommunityPosts,
-  mockNewsletterSubscribers,
-  mockStaff,
-  mockDiscounts,
-} from "@/src/lib/mock-data";
-import {
   type Order,
   type Product,
   type Customer,
   type Discount,
   type NotificationItem,
   type ActivityLog,
-  type Collection,
   type GiftCard,
   type Transaction,
   type Refund,
@@ -111,8 +96,6 @@ interface AdminContextType {
   setDiscounts: React.Dispatch<React.SetStateAction<Discount[]>>;
   notifications: NotificationItem[];
   setNotifications: React.Dispatch<React.SetStateAction<NotificationItem[]>>;
-  collections: Collection[];
-  setCollections: React.Dispatch<React.SetStateAction<Collection[]>>;
   giftCards: GiftCard[];
   setGiftCards: React.Dispatch<React.SetStateAction<GiftCard[]>>;
   transactions: Transaction[];
@@ -137,6 +120,7 @@ interface AdminContextType {
   setStaff: React.Dispatch<React.SetStateAction<StaffMember[]>>;
   activityLogs: ActivityLog[];
   setActivityLogs: React.Dispatch<React.SetStateAction<ActivityLog[]>>;
+  categories: CategoryDoc[];
 
   markNotificationAsRead: (id: string) => void;
   markAllNotificationsRead: () => void;
@@ -150,15 +134,10 @@ const AdminContext = createContext<AdminContextType | undefined>(undefined);
  *
  * It's now **dual-sourced**:
  *
- *   - `orders`, `products`, `customers`, `collections`, `discounts`
+ *   - `orders`, `products`, `customers`, `discounts`
  *     come from Firestore listeners (see `src/lib/firebase/*.ts`).
- *   - `giftCards`, `transactions`, `refunds`, `shippingZones`,
- *     `deliveryRiders`, `returnRequests`, `campaigns`, `reviews`,
- *     `communityPosts`, `newsletterSubscribers`, `staff`,
- *     `activityLogs` keep their mock-data shape for now; the pages
- *     that surface them will be wired to Firestore in the next
- *     phase. Keeping the shape stable means the existing UI keeps
- *     working without rewrites.
+ *   - dashboard state without a Firestore listener starts empty and is
+ *     populated only by its real data source.
  *
  * The local `setX` setters stay exposed so individual pages can
  * apply optimistic updates where the listener hasn't fired yet.
@@ -172,7 +151,6 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   const { products, loading: productsLoading } = useProducts();
   const { orders, loading: ordersLoading } = useOrders();
   const { customers, loading: customersLoading } = useCustomers();
-  const { collections, loading: collectionsLoading } = useCollections();
   const { discounts, loading: discountsLoading } = usePromoCodes();
   const { giftCards: liveGiftCards, loading: giftCardsLoading } = useGiftCards();
   const { shippingZones: liveShippingZones, loading: shippingZonesLoading } = useShippingZones();
@@ -195,13 +173,13 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   const loaderTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Still-mock collections (kept local so existing pages render).
-  const [transactions, setTransactions] = useState<Transaction[]>(mockTransactions);
-  const [refunds, setRefunds] = useState<Refund[]>(mockRefunds);
-  const [deliveryRiders, setDeliveryRiders] = useState<DeliveryRide[]>(mockDeliveryRiders);
-  const [returnRequests, setReturnRequests] = useState<ReturnRequest[]>(mockReturnRequests);
-  const [campaigns, setCampaigns] = useState<Campaign[]>(mockCampaigns);
-  const [communityPosts, setCommunityPosts] = useState<CommunityPost[]>(mockCommunityPosts);
-  const [newsletterSubscribers, setNewsletterSubscribers] = useState<NewsletterSubscriber[]>(mockNewsletterSubscribers);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [refunds, setRefunds] = useState<Refund[]>([]);
+  const [deliveryRiders, setDeliveryRiders] = useState<DeliveryRide[]>([]);
+  const [returnRequests, setReturnRequests] = useState<ReturnRequest[]>([]);
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [communityPosts, setCommunityPosts] = useState<CommunityPost[]>([]);
+  const [newsletterSubscribers, setNewsletterSubscribers] = useState<NewsletterSubscriber[]>([]);
 
   // State with live Firestore fallback
   const [localGiftCards, setLocalGiftCards] = useState<GiftCard[]>([]);
@@ -339,8 +317,6 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
       setDiscounts: noopSet<Discount[]>,
       notifications,
       setNotifications,
-      collections,
-      setCollections: noopSet<Collection[]>,
       giftCards,
       setGiftCards,
       transactions,
@@ -365,6 +341,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
       setStaff,
       activityLogs,
       setActivityLogs: noopSet<ActivityLog[]>,
+      categories,
 
       markNotificationAsRead,
       markAllNotificationsRead,
@@ -392,7 +369,6 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
       customers,
       discounts,
       notifications,
-      collections,
       giftCards,
       transactions,
       refunds,

@@ -53,7 +53,7 @@ export const ROLE_DESCRIPTIONS: Record<Role, string> = {
   order_manager:
     "Orders, refunds, returns, customers (read), and shipping zones.",
   inventory_manager:
-    "Products, inventory, and collections (add/edit stock and catalog).",
+    "Products and inventory (add/edit stock and catalog).",
   marketing_manager:
     "Storefront CMS, categories, journal, reviews, and newsletter.",
   customer_support:
@@ -73,8 +73,6 @@ export type Action =
   | "products:write"
   | "customers:read"
   | "customers:write"
-  | "collections:read"
-  | "collections:write"
   | "discounts:read"
   | "discounts:write"
   | "cms:read"
@@ -113,8 +111,6 @@ export const PERMISSIONS: Record<Role, Action[]> = {
     "products:write",
     "customers:read",
     "customers:write",
-    "collections:read",
-    "collections:write",
     "discounts:read",
     "discounts:write",
     "cms:read",
@@ -145,8 +141,6 @@ export const PERMISSIONS: Record<Role, Action[]> = {
     "products:write",
     "customers:read",
     "customers:write",
-    "collections:read",
-    "collections:write",
     "discounts:read",
     "discounts:write",
     "cms:read",
@@ -179,8 +173,6 @@ export const PERMISSIONS: Record<Role, Action[]> = {
     "dashboard:read",
     "products:read",
     "products:write",
-    "collections:read",
-    "collections:write",
     "analytics:read",
   ],
   marketing_manager: [
@@ -231,7 +223,7 @@ export const NAV_PERMISSIONS: Record<string, Action> = {
   "/admin": "dashboard:read",
   "/admin/orders": "orders:read",
   "/admin/products": "products:read",
-  "/admin/collections": "collections:read",
+  "/admin/categories": "categories:write",
   "/admin/inventory": "products:read",
   "/admin/customers": "customers:read",
   "/admin/discounts": "discounts:read",
@@ -243,7 +235,6 @@ export const NAV_PERMISSIONS: Record<string, Action> = {
   "/admin/website/navigation": "navigation:write",
   "/admin/website/announcements": "cms:publish",
   "/admin/website/popups": "cms:publish",
-  "/admin/website/categories": "categories:write",
   "/admin/website/brand": "cms:publish",
   "/admin/website/theme": "theme:write",
   "/admin/website/footer": "cms:publish",
